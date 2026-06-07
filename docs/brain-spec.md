@@ -62,6 +62,8 @@ ADR-0001-initial-architecture.md
 
 Each ADR should include status, context, decision, and consequences.
 
+`avipack adr new` creates the next numbered ADR file under `.avipack/decisions/` and does not overwrite existing files.
+
 ## Change Request Strategy
 
 Change requests use monotonic filenames:
@@ -71,6 +73,8 @@ CR-0002-add-authentication.md
 ```
 
 Each CR should explain scope, linked requirements, impact, and validation expectations.
+
+`avipack change new` creates the next numbered CR file under `.avipack/changes/` and does not overwrite existing files.
 
 ## Test Mapping Strategy
 

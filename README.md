@@ -87,7 +87,7 @@ avipack change new
 avipack adr new
 ```
 
-`avipack init` and `avipack adopt` are implemented for the `generic-brain-only` template. Other commands remain safe placeholders until their milestones.
+`avipack init` and `avipack adopt` are implemented for the `generic-brain-only` template. Bot lifecycle commands, brain checks, change request generation, and ADR generation now have local MVP behavior.
 
 ## Brain Folder Overview
 
@@ -109,6 +109,8 @@ The brain is the source of truth for project intent, requirements, architecture,
 ## Bot Overview
 
 Bots are separate packages and must be installed, enabled, and run under owner control. Installing a bot must not make it run automatically.
+
+In the current MVP, `avipack bot add <bot>` records the known bot in the project-local `avipack.config.yaml`; it does not install npm packages and does not run the bot. `avipack bot enable <bot>` only updates owner-controlled enabled state. `avipack bot run <bot>` is manual and writes an execution report under `.avipack/reports/bots/` without AI provider calls or application source changes.
 
 Initial planned bots:
 
@@ -135,9 +137,11 @@ examples/
 ## Development Setup
 
 ```bash
+corepack enable
 pnpm install
 pnpm typecheck
 pnpm build
+pnpm test
 ```
 
 This is a TypeScript, ESM, pnpm workspace monorepo.
@@ -148,6 +152,22 @@ If `pnpm` is not available but Node.js Corepack is installed, enable pnpm first 
 corepack pnpm install
 corepack pnpm typecheck
 corepack pnpm build
+```
+
+Useful local CLI checks after building:
+
+```bash
+node packages/cli/dist/index.js --help
+mkdir -p /tmp/avipack-demo
+cd /tmp/avipack-demo
+node /path/to/avipack/packages/cli/dist/index.js init --name DemoProduct
+node /path/to/avipack/packages/cli/dist/index.js brain check --report
+node /path/to/avipack/packages/cli/dist/index.js bot list
+node /path/to/avipack/packages/cli/dist/index.js bot add brain
+node /path/to/avipack/packages/cli/dist/index.js bot enable brain
+node /path/to/avipack/packages/cli/dist/index.js bot run brain
+node /path/to/avipack/packages/cli/dist/index.js change new --title "Add authentication flow"
+node /path/to/avipack/packages/cli/dist/index.js adr new --title "Use PostgreSQL for relational data"
 ```
 
 ## Roadmap Summary

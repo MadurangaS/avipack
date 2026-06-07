@@ -1,15 +1,23 @@
 import { Command } from "commander";
-import { findKnownBot, listKnownBots } from "@avipack/core";
+import {
+  addInstalledBot,
+  AvipackProjectRequiredError,
+  BotNotEnabledError,
+  BotNotInstalledError,
+  disableBot,
+  enableBot,
+  listBotsWithState,
+  runBot,
+  UnknownBotError
+} from "@avipack/core";
 
-function printBotAction(action: string, botName: string): void {
-  const bot = findKnownBot(botName);
+interface AddBotOptions {
+  enable?: boolean;
+}
 
-  console.log(`Avipack Bot ${action}`);
-  console.log("");
-  console.log("Status: foundation mode");
-  console.log(`Bot: ${bot?.name ?? botName}`);
-  console.log("Result: command acknowledged; no installation or file changes performed yet.");
-  console.log("Next: bot lifecycle management will be implemented in Phase 2.");
+interface RunBotOptions {
+  dryRun?: boolean;
+  allowDisabled?: boolean;
 }
 
 export function registerBotCommand(program: Command): void {
@@ -21,10 +29,14 @@ export function registerBotCommand(program: Command): void {
     .action(() => {
       console.log("Avipack Bot List");
       console.log("");
-      console.log("Status: foundation mode");
 
-      for (const knownBot of listKnownBots()) {
-        console.log(`- ${knownBot.name} (${knownBot.packageName}): ${knownBot.description}`);
+      for (const knownBot of listBotsWithState()) {
+        console.log(`- ${knownBot.id}`);
+        console.log(`  Name: ${knownBot.name}`);
+        console.log(`  Package: ${knownBot.packageName}`);
+        console.log(`  Installed: ${knownBot.installed ? "yes" : "no"}`);
+        console.log(`  Enabled: ${knownBot.enabled ? "yes" : "no"}`);
+        console.log(`  Description: ${knownBot.description}`);
       }
     });
 
@@ -32,23 +44,89 @@ export function registerBotCommand(program: Command): void {
     .command("add")
     .argument("<bot>", "bot name, id, or package")
     .description("Prepare a bot for installation.")
-    .action((botName: string) => printBotAction("Add", botName));
+    .option("--enable", "enable the bot after adding it")
+    .action(async (botName: string, options: AddBotOptions) => {
+      try {
+        const result = await addInstalledBot(botName, { enable: options.enable });
+        console.log(result.status === "already-installed" ? "Avipack bot already installed." : "Avipack bot added.");
+        printBotResult(result.bot.name, result.reportPath);
+      } catch (error) {
+        printBotError(error);
+      }
+    });
 
   bot
     .command("enable")
     .argument("<bot>", "bot name, id, or package")
     .description("Enable an installed bot.")
-    .action((botName: string) => printBotAction("Enable", botName));
+    .action(async (botName: string) => {
+      try {
+        const result = await enableBot(botName);
+        console.log(result.status === "already-enabled" ? "Avipack bot already enabled." : "Avipack bot enabled.");
+        printBotResult(result.bot.name, result.reportPath);
+      } catch (error) {
+        printBotError(error);
+      }
+    });
 
   bot
     .command("disable")
     .argument("<bot>", "bot name, id, or package")
     .description("Disable an installed bot.")
-    .action((botName: string) => printBotAction("Disable", botName));
+    .action(async (botName: string) => {
+      try {
+        const result = await disableBot(botName);
+        console.log(result.status === "already-disabled" ? "Avipack bot already disabled." : "Avipack bot disabled.");
+        printBotResult(result.bot.name, result.reportPath);
+      } catch (error) {
+        printBotError(error);
+      }
+    });
 
   bot
     .command("run")
     .argument("<bot>", "bot name, id, or package")
     .description("Run a bot manually.")
-    .action((botName: string) => printBotAction("Run", botName));
+    .option("--dry-run", "show what would happen without writing a report")
+    .option("--allow-disabled", "allow manual run even when the bot is disabled")
+    .action(async (botName: string, options: RunBotOptions) => {
+      try {
+        const result = await runBot(botName, { dryRun: options.dryRun, allowDisabled: options.allowDisabled });
+
+        if (result.status === "dry-run") {
+          console.log("Avipack bot run dry run.");
+          console.log("");
+          console.log(`Bot: ${result.bot.name}`);
+          console.log("Would create: .avipack/reports/bots/<timestamp>-run report");
+          console.log("No files were modified.");
+          return;
+        }
+
+        console.log("Avipack bot run completed.");
+        printBotResult(result.bot.name, result.reportPath);
+        console.log("");
+        console.log("MVP Result: report written only; no AI analysis or application source changes were performed.");
+      } catch (error) {
+        printBotError(error);
+      }
+    });
+}
+
+function printBotResult(botName: string, reportPath?: string): void {
+  console.log("");
+  console.log(`Bot: ${botName}`);
+
+  if (reportPath) {
+    console.log(`Report: ${reportPath}`);
+  }
+}
+
+function printBotError(error: unknown): void {
+  if (error instanceof UnknownBotError || error instanceof AvipackProjectRequiredError || error instanceof BotNotInstalledError || error instanceof BotNotEnabledError) {
+    console.error(error.message);
+  } else {
+    console.error(error instanceof Error ? error.message : "Bot command failed.");
+  }
+
+  process.exitCode = 1;
 }

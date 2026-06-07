@@ -10,6 +10,7 @@ export interface AvipackConfig {
     path: string;
   };
   bots: {
+    installed: string[];
     enabled: string[];
   };
 }
@@ -18,4 +19,6 @@ export interface BrainCheckResult {
   passed: boolean;
   checkedFiles: string[];
   missingFiles: string[];
+  errors: string[];
+  warnings: string[];
 }

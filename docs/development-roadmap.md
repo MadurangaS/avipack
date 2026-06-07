@@ -14,16 +14,20 @@
 - Core-bundled template resolution: implemented.
 - Brain file generation: implemented for MVP template.
 - Basic template variables: implemented for project name.
-- Basic brain check: implemented for required MVP files.
+- Brain check: implemented for required files, YAML parse validation, duplicate ID warnings, trace warnings, strict mode, and report writing.
 - `avipack adopt`: implemented for safe brain-only adoption.
+- Project-local bot lifecycle MVP: implemented for list/add/enable/disable/run reports.
+- Change request generation: implemented.
+- ADR generation: implemented.
+- Node test runner coverage: implemented for core and CLI MVP behavior.
 - Advanced conflict engine: pending.
 - Additional starter packs: pending.
 
 ## Phase 2 - Bot Plugin MVP
 
-- Install/list/enable/disable bots.
-- Manual bot execution.
-- Bot permission validation.
+- Real package installation for optional bots.
+- Scoped bot implementations beyond report-only MVP.
+- Deeper bot permission validation.
 
 ## Phase 3 - Conflict Engine
 

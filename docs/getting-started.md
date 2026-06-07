@@ -37,6 +37,14 @@ Build all packages:
 pnpm build
 ```
 
+Run the Node test suite:
+
+```bash
+pnpm test
+```
+
+The test suite uses temporary directories and does not write test projects into the repository root.
+
 ## Initialize a Project
 
 The first working MVP feature is `avipack init` with the `generic-brain-only` template.
@@ -115,9 +123,29 @@ Bots remain manual by default.
 
 ```bash
 avipack brain check
+avipack brain check --report
 ```
 
-The foundation-stage command checks for required `.avipack` paths. Future versions will validate YAML schemas and traceability.
+The MVP command checks required `.avipack` paths, validates YAML parsing, reports duplicate IDs, and warns about simple trace mismatches. Warnings do not fail unless `--strict` is passed.
+
+## Manual Local Verification
+
+After `pnpm build`, try the CLI in a temporary project:
+
+```bash
+mkdir -p /tmp/avipack-demo
+cd /tmp/avipack-demo
+
+node /path/to/avipack/packages/cli/dist/index.js init --name DemoProduct
+node /path/to/avipack/packages/cli/dist/index.js brain check
+node /path/to/avipack/packages/cli/dist/index.js bot list
+node /path/to/avipack/packages/cli/dist/index.js bot add brain
+node /path/to/avipack/packages/cli/dist/index.js bot enable brain
+node /path/to/avipack/packages/cli/dist/index.js bot run brain
+node /path/to/avipack/packages/cli/dist/index.js change new --title "Add authentication flow"
+node /path/to/avipack/packages/cli/dist/index.js adr new --title "Use PostgreSQL for relational data"
+node /path/to/avipack/packages/cli/dist/index.js brain check --report
+```
 
 ## Example User Journey
 

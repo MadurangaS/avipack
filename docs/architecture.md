@@ -23,6 +23,8 @@ flowchart TD
 - Config loading.
 - Brain creation/checking.
 - Existing project adoption and simple stack detection.
+- Project-local bot lifecycle state and report writing.
+- Change request and ADR file generation.
 - Bot manifest types and registry helpers.
 - Starter template registry.
 - YAML validation.
@@ -43,6 +45,8 @@ Force mode is intentionally narrow: it may refresh `.avipack/` and `avipack.conf
 
 Bots live in separate packages. Each bot exports a manifest and a `run()` function. The CLI can discover and invoke bots later, but bot behavior should remain permission-scoped and explicit.
 
+The current local MVP does not install or execute real bot package behavior. It records installed/enabled bot state in `avipack.config.yaml` and writes audit or execution reports under `.avipack/reports/bots/`. Adding and enabling bots are explicit owner actions and never trigger execution.
+
 ## Brain Files
 
 The brain stores project state and control documents:
@@ -57,6 +61,8 @@ The brain stores project state and control documents:
 - Change requests.
 - Agent rules.
 - Reports.
+
+`avipack brain check` validates required files, YAML parsing, duplicate IDs, and simple requirement traces. Report output is written only when explicitly requested with `--report`.
 
 ## Extension Points
 

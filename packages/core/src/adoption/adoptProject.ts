@@ -182,6 +182,7 @@ brain:
   path: .avipack/brain
 
 bots:
+  installed: []
   enabled: []
 `
   );
