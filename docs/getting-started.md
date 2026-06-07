@@ -81,13 +81,23 @@ node packages/cli/dist/index.js init --name demo-project --force
 
 ## Adopt an Existing Project
 
-Future behavior:
+Use `avipack adopt` when a project already has source code, package files, docs, and a README.
 
 ```bash
-avipack adopt
+node packages/cli/dist/index.js adopt
+node packages/cli/dist/index.js adopt --name solar-monitoring-dashboard
+node packages/cli/dist/index.js adopt --dry-run
 ```
 
-This will add only the Avipack Brain files without changing the application framework.
+This adds Avipack Brain files without changing the application framework:
+
+```txt
+.avipack/
+avipack.config.yaml
+.avipack/reports/adoption-report.md
+```
+
+If `README.md` already exists, adoption skips it and reports that it was not overwritten. If `.avipack/` or `avipack.config.yaml` already exists, adoption stops unless `--force` is passed. Force mode refreshes only Avipack-owned files and still preserves an existing README.
 
 ## Add Bots
 

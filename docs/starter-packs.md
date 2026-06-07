@@ -4,9 +4,9 @@ Starter packs create project structures. Avipack supports both full application 
 
 ## `generic-brain-only`
 
-Status: scaffolded.
+Status: implemented for `init` and `adopt`.
 
-Adds `.avipack`, `avipack.config.yaml`, starter requirements, ADRs, change requests, schemas, reports, and agent rules. This is the MVP priority because users may already have a project.
+Adds `.avipack`, `avipack.config.yaml`, starter requirements, ADRs, change requests, schemas, reports, and agent rules. In adoption mode it preserves an existing README and writes `.avipack/reports/adoption-report.md` with detected stack hints and next steps.
 
 ## `nextjs-typescript-postgres`
 

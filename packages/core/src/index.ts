@@ -1,3 +1,8 @@
+export { adoptProject, AdoptionConflictError } from "./adoption/adoptProject.js";
+export type { AdoptProjectOptions, AdoptProjectResult } from "./adoption/adoptProject.js";
+export { detectProject } from "./adoption/detectProject.js";
+export type { DetectedProject } from "./adoption/detectProject.js";
+export { writeAdoptionReport } from "./adoption/writeAdoptionReport.js";
 export { checkBrain } from "./brain/checkBrain.js";
 export { createBrain, deriveProjectName, TemplateConflictError } from "./brain/createBrain.js";
 export { loadConfig } from "./config/loadConfig.js";

@@ -58,6 +58,18 @@ npx avipack adopt
 npx avipack brain check
 ```
 
+## Adopt an Existing Project
+
+Use `avipack adopt` to add Avipack Brain to an existing project without overwriting application code.
+
+```bash
+node packages/cli/dist/index.js adopt
+node packages/cli/dist/index.js adopt --name solar-monitoring-dashboard
+node packages/cli/dist/index.js adopt --dry-run
+```
+
+Adoption creates `.avipack/`, `avipack.config.yaml`, and `.avipack/reports/adoption-report.md`. If `README.md` already exists, it is skipped and reported instead of overwritten. Use `--force` only to refresh existing Avipack-owned files such as `.avipack/` and `avipack.config.yaml`.
+
 ## CLI Command Overview
 
 Planned command surface:
@@ -75,7 +87,7 @@ avipack change new
 avipack adr new
 ```
 
-`avipack init` is implemented for the `generic-brain-only` template. Other commands remain safe placeholders until their milestones.
+`avipack init` and `avipack adopt` are implemented for the `generic-brain-only` template. Other commands remain safe placeholders until their milestones.
 
 ## Brain Folder Overview
 

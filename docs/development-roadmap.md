@@ -15,7 +15,7 @@
 - Brain file generation: implemented for MVP template.
 - Basic template variables: implemented for project name.
 - Basic brain check: implemented for required MVP files.
-- `avipack adopt`: pending.
+- `avipack adopt`: implemented for safe brain-only adoption.
 - Advanced conflict engine: pending.
 - Additional starter packs: pending.
 

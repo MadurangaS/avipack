@@ -39,15 +39,37 @@ Future behavior: support additional starter packs, richer template variables, st
 
 Purpose: Add Avipack Brain to an existing project.
 
-Example:
+Options:
+
+- `--template <template>`: starter template to use. Defaults to `generic-brain-only`.
+- `--name <name>`: project name to write into generated brain files. Defaults to the current folder name.
+- `--force`: overwrite existing Avipack-owned files, limited to `.avipack/` and `avipack.config.yaml`.
+- `--dry-run`: show what would be created, skipped, or overwritten without writing files.
+
+Examples:
 
 ```bash
 avipack adopt
+avipack adopt --name solar-monitoring-dashboard
+avipack adopt --dry-run
+avipack adopt --force
 ```
 
-Current MVP behavior: prints planned adoption output.
+Current MVP behavior: detects a simple project stack, creates `.avipack/`, creates `avipack.config.yaml`, writes `.avipack/reports/adoption-report.md`, updates adopted project metadata, runs a basic brain check, and prints created/skipped/overwritten paths.
 
-Future behavior: detect project stack and add `.avipack` safely.
+Safety behavior: adoption does not overwrite application source code, does not delete user files, and does not overwrite an existing `README.md`. If `.avipack/` or `avipack.config.yaml` exists, adoption stops unless `--force` is passed. With `--force`, Avipack may refresh only `.avipack/` and `avipack.config.yaml`.
+
+The generated adopted config uses:
+
+```yaml
+project:
+  name: solar-monitoring-dashboard
+  mode: adopt
+
+brain:
+  root: .avipack
+  path: .avipack/brain
+```
 
 ## `avipack brain check`
 

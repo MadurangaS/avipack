@@ -1,8 +1,9 @@
 export interface AvipackConfig {
   project: {
-    id: string;
+    id?: string;
     name: string;
-    template: string;
+    template?: string;
+    mode?: "init" | "adopt";
   };
   brain: {
     root: string;

@@ -22,6 +22,7 @@ flowchart TD
 
 - Config loading.
 - Brain creation/checking.
+- Existing project adoption and simple stack detection.
 - Bot manifest types and registry helpers.
 - Starter template registry.
 - YAML validation.
@@ -31,6 +32,12 @@ flowchart TD
 The MVP generic template is bundled inside `@avipack/core` under `packages/core/templates`. This lets the installed core package resolve the working `generic-brain-only` template without depending on the monorepo root.
 
 `packages/templates` remains a workspace area for future starter-pack documentation and expansion. Future starter packs may become separate packages once template packaging and versioning need to scale.
+
+## Adoption Flow
+
+`avipack adopt` is implemented as core logic exposed through a thin CLI command. The core adoption flow detects simple project stack hints, copies only Avipack-owned template targets, preserves an existing README, writes adopted project metadata, and records `.avipack/reports/adoption-report.md`.
+
+Force mode is intentionally narrow: it may refresh `.avipack/` and `avipack.config.yaml`, but it must not overwrite application source code or an existing README.
 
 ## Bot Plugin Layer
 
