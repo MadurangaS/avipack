@@ -90,6 +90,34 @@ avipack brain check --strict
 
 Current MVP behavior: checks required paths, validates YAML parsing for brain/config YAML files, reports duplicate requirement IDs, reports duplicate architecture IDs, and warns when requirement traces reference unknown change requests, architecture IDs, or planned test IDs.
 
+## `avipack doctor`
+
+Purpose: Check local Avipack CLI and project health.
+
+Options:
+
+- `--json`: print machine-readable doctor output.
+
+Examples:
+
+```bash
+avipack doctor
+avipack doctor --json
+```
+
+Current MVP behavior: reports Node.js version, platform, current directory, whether the directory is an Avipack project, config status, brain file status, bot config validity, and report directory writability. Warnings do not fail; errors exit with code 1.
+
+## `avipack version`
+
+Purpose: Print the Avipack CLI version.
+
+Examples:
+
+```bash
+avipack --version
+avipack version
+```
+
 ## `avipack bot list`
 
 Purpose: List known bots and project-local state.

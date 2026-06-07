@@ -58,6 +58,15 @@ npx avipack adopt
 npx avipack brain check
 ```
 
+Current local CLI usage after building:
+
+```bash
+node packages/cli/dist/index.js --help
+node packages/cli/dist/index.js --version
+node packages/cli/dist/index.js version
+node packages/cli/dist/index.js doctor
+```
+
 ## Adopt an Existing Project
 
 Use `avipack adopt` to add Avipack Brain to an existing project without overwriting application code.
@@ -85,6 +94,8 @@ avipack bot disable <bot>
 avipack bot run <bot>
 avipack change new
 avipack adr new
+avipack doctor
+avipack version
 ```
 
 `avipack init` and `avipack adopt` are implemented for the `generic-brain-only` template. Bot lifecycle commands, brain checks, change request generation, and ADR generation now have local MVP behavior.
@@ -142,6 +153,7 @@ pnpm install
 pnpm typecheck
 pnpm build
 pnpm test
+pnpm verify
 ```
 
 This is a TypeScript, ESM, pnpm workspace monorepo.
@@ -169,6 +181,17 @@ node /path/to/avipack/packages/cli/dist/index.js bot run brain
 node /path/to/avipack/packages/cli/dist/index.js change new --title "Add authentication flow"
 node /path/to/avipack/packages/cli/dist/index.js adr new --title "Use PostgreSQL for relational data"
 ```
+
+Local packaging checks:
+
+```bash
+pnpm clean
+pnpm build
+pnpm pack:cli
+tar -tzf packages/cli/avipack-0.1.0.tgz
+```
+
+Avipack is not published to npm yet. There is no hosted service, LLM provider integration, autonomous bot execution, background daemon, scheduler, or Git hook execution in this milestone.
 
 ## Clean Source ZIP
 

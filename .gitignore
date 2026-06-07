@@ -4,6 +4,7 @@ dist
 .DS_Store
 __MACOSX
 *.log
+*.tgz
 *.tsbuildinfo
 .pnpm-store
 coverage/

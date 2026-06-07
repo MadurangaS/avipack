@@ -2,6 +2,18 @@
   "name": "@avipack/core",
   "version": "0.1.0",
   "description": "Core project brain, template, config, and bot registry utilities for Avipack.",
+  "license": "UNLICENSED",
+  "author": "TODO",
+  "repository": {
+    "type": "git",
+    "url": "TODO"
+  },
+  "keywords": [
+    "project-brain",
+    "requirements",
+    "adr",
+    "governance"
+  ],
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

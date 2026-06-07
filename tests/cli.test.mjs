@@ -24,6 +24,79 @@ test("avipack --help works", async () => {
   assert.match(stdout, /avipack/);
 });
 
+test("avipack --help includes key commands", async () => {
+  const { stdout } = await runCli(["--help"], process.cwd());
+
+  for (const command of ["init", "adopt", "brain", "bot", "change", "adr", "doctor", "version"]) {
+    assert.match(stdout, new RegExp(`\\b${command}\\b`));
+  }
+});
+
+test("avipack --version prints product version", async () => {
+  const { stdout } = await runCli(["--version"], process.cwd());
+  assert.match(stdout.trim(), /^avipack \d+\.\d+\.\d+$/);
+});
+
+test("avipack version prints product version", async () => {
+  const { stdout } = await runCli(["version"], process.cwd());
+  assert.match(stdout.trim(), /^avipack \d+\.\d+\.\d+$/);
+});
+
+test("avipack doctor outside Avipack project works", async () => {
+  const cwd = await tempProject();
+  const { stdout } = await runCli(["doctor"], cwd);
+
+  assert.match(stdout, /Avipack Doctor/);
+  assert.match(stdout, /Avipack project: no/);
+  assert.match(stdout, /Result: healthy/);
+});
+
+test("avipack doctor inside Avipack project works", async () => {
+  const cwd = await tempProject();
+  await runCli(["init", "--name", "DoctorCliApp"], cwd);
+  const { stdout } = await runCli(["doctor"], cwd);
+
+  assert.match(stdout, /Avipack project: yes/);
+  assert.match(stdout, /Brain files: ok/);
+  assert.match(stdout, /Result: healthy/);
+});
+
+test("avipack doctor --json works", async () => {
+  const cwd = await tempProject();
+  const { stdout } = await runCli(["doctor", "--json"], cwd);
+  const parsed = JSON.parse(stdout);
+
+  assert.equal(typeof parsed.healthy, "boolean");
+  assert.equal(parsed.project.isAvipackProject, false);
+  assert.equal(parsed.runtime.node, process.version);
+});
+
+test("CLI package metadata has valid bin entry", async () => {
+  const packageJson = JSON.parse(await readFile(resolve("packages/cli/package.json"), "utf8"));
+
+  assert.equal(packageJson.bin.avipack, "dist/index.js");
+  assert.equal(packageJson.type, "module");
+  assert.ok(packageJson.files.includes("dist"));
+});
+
+test("CLI package dry-run pack excludes unrelated generated folders", async () => {
+  const npmCache = await tempProject("avipack-npm-cache-");
+  const { stdout } = await execFileAsync("npm", ["pack", "--dry-run", "--json"], {
+    cwd: resolve("packages/cli"),
+    env: { ...process.env, npm_config_cache: npmCache }
+  });
+  const [packResult] = JSON.parse(stdout);
+  const files = packResult.files.map((file) => file.path);
+
+  assert.ok(files.includes("dist/index.js"));
+  assert.ok(files.includes("package.json"));
+  assert.equal(files.some((file) => file.includes(".pnpm-store")), false);
+  assert.equal(files.some((file) => file.includes("coverage/")), false);
+  assert.equal(files.some((file) => file.includes("__MACOSX")), false);
+  assert.equal(files.some((file) => file.includes(".DS_Store")), false);
+  assert.equal(files.some((file) => file.startsWith("../")), false);
+});
+
 test("avipack init --name TestApp creates files in temp directory", async () => {
   const cwd = await tempProject();
   await runCli(["init", "--name", "TestApp"], cwd);

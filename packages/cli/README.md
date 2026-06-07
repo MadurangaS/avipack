@@ -16,5 +16,15 @@ Implemented local MVP commands include:
 - `avipack bot run <bot>`
 - `avipack change new`
 - `avipack adr new`
+- `avipack doctor`
+- `avipack version`
 
 Bots are owner-controlled. Adding or enabling a bot does not run it, and the current run command writes a project-local report only.
+
+Local checks:
+
+```bash
+node dist/index.js --help
+node dist/index.js --version
+node dist/index.js doctor
+```

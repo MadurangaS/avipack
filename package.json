@@ -3,13 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "description": "AI-ready project starter and project-brain system for controlled human and AI software development.",
+  "license": "UNLICENSED",
+  "author": "TODO",
+  "repository": {
+    "type": "git",
+    "url": "TODO"
+  },
+  "keywords": [
+    "cli",
+    "project-brain",
+    "ai-development",
+    "requirements",
+    "governance"
+  ],
   "type": "module",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
+    "clean": "node scripts/clean.mjs",
     "build": "pnpm -r build",
-    "typecheck": "pnpm -r typecheck",
+    "typecheck": "pnpm --filter @avipack/core build && pnpm -r typecheck",
     "lint": "tsc -p packages/core/tsconfig.json --noEmit && tsc -p packages/cli/tsconfig.json --noEmit",
-    "test": "pnpm build && node --test tests/*.test.mjs"
+    "test": "pnpm build && node --test tests/*.test.mjs",
+    "pack:cli": "node scripts/pack-cli.mjs",
+    "verify": "pnpm clean && pnpm typecheck && pnpm build && pnpm test && node scripts/pack-cli.mjs --dry-run"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

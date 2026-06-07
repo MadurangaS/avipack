@@ -20,6 +20,7 @@
 - Change request generation: implemented.
 - ADR generation: implemented.
 - Node test runner coverage: implemented for core and CLI MVP behavior.
+- Installable local CLI readiness: implemented for CLI metadata, version command, doctor command, clean/verify scripts, and local pack checks.
 - Advanced conflict engine: pending.
 - Additional starter packs: pending.
 

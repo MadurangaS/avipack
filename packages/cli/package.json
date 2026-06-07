@@ -2,17 +2,32 @@
   "name": "avipack",
   "version": "0.1.0",
   "description": "Avipack command-line interface.",
+  "license": "UNLICENSED",
+  "author": "TODO",
+  "repository": {
+    "type": "git",
+    "url": "TODO"
+  },
+  "keywords": [
+    "cli",
+    "project-brain",
+    "requirements",
+    "adr",
+    "governance"
+  ],
   "type": "module",
   "bin": {
     "avipack": "dist/index.js"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "package.json",
     "README.md"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && node -e \"require('fs').chmodSync('dist/index.js', 0o755)\"",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
