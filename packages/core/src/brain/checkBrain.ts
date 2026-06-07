@@ -65,7 +65,7 @@ export function checkBrain(cwdOrOptions: string | CheckBrainOptions = process.cw
   });
 
   const passed = errors.length === 0 && (!options.strict || warnings.length === 0);
-  const result = {
+  const result: BrainCheckResult = {
     passed,
     checkedFiles: requiredBrainFiles,
     missingFiles,
@@ -73,11 +73,19 @@ export function checkBrain(cwdOrOptions: string | CheckBrainOptions = process.cw
     warnings
   };
 
-  if (options.report) {
+  if (options.report && canWriteBrainCheckReport(cwd)) {
     writeBrainCheckReport(cwd, result);
+    result.reportWritten = true;
+  } else if (options.report) {
+    result.reportWritten = false;
+    result.reportMessage = "Report was not written because this is not an Avipack project. Run avipack init first.";
   }
 
   return result;
+}
+
+function canWriteBrainCheckReport(cwd: string): boolean {
+  return existsSync(join(cwd, ".avipack"));
 }
 
 function getRequirementIds(source: unknown): string[] {

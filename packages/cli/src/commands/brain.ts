@@ -46,7 +46,11 @@ export function registerBrainCommand(program: Command): void {
       }
 
       if (options.report) {
-        console.log("Report: .avipack/reports/brain-check.md");
+        if (result.reportWritten) {
+          console.log("Report: .avipack/reports/brain-check.md");
+        } else if (result.reportMessage) {
+          console.log(result.reportMessage);
+        }
       }
 
       if (!result.passed) {

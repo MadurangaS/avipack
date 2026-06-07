@@ -21,4 +21,6 @@ export interface BrainCheckResult {
   missingFiles: string[];
   errors: string[];
   warnings: string[];
+  reportWritten?: boolean;
+  reportMessage?: string;
 }

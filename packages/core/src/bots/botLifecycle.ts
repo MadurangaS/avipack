@@ -13,7 +13,17 @@ export type BotState = {
 
 export type BotActionResult = {
   bot: BotManifest;
-  status: "added" | "already-installed" | "enabled" | "already-enabled" | "disabled" | "already-disabled" | "ran" | "dry-run";
+  status:
+    | "added"
+    | "already-installed"
+    | "already-installed-enabled"
+    | "already-installed-already-enabled"
+    | "enabled"
+    | "already-enabled"
+    | "disabled"
+    | "already-disabled"
+    | "ran"
+    | "dry-run";
   config?: AvipackConfig;
   reportPath?: string;
 };
@@ -74,6 +84,17 @@ export async function addInstalledBot(input: string, options: { cwd?: string; en
   const config = requireProjectConfig(cwd);
 
   if (config.bots.installed.includes(bot.id)) {
+    if (options.enable && !config.bots.enabled.includes(bot.id)) {
+      config.bots.enabled.push(bot.id);
+      await writeConfig(cwd, config);
+      const reportPath = await writeBotAuditReport(cwd, bot, "enable", `${bot.name} was already installed and was enabled by explicit flag.`);
+      return { bot, status: "already-installed-enabled", config, reportPath };
+    }
+
+    if (options.enable && config.bots.enabled.includes(bot.id)) {
+      return { bot, status: "already-installed-already-enabled", config };
+    }
+
     return { bot, status: "already-installed", config };
   }
 
@@ -111,6 +132,10 @@ export async function disableBot(input: string, options: { cwd?: string } = {}):
   const cwd = resolve(options.cwd ?? process.cwd());
   const bot = requireKnownBot(input);
   const config = requireProjectConfig(cwd);
+
+  if (!config.bots.installed.includes(bot.id)) {
+    throw new BotNotInstalledError(bot);
+  }
 
   if (!config.bots.enabled.includes(bot.id)) {
     return { bot, status: "already-disabled", config };

@@ -170,6 +170,20 @@ node /path/to/avipack/packages/cli/dist/index.js change new --title "Add authent
 node /path/to/avipack/packages/cli/dist/index.js adr new --title "Use PostgreSQL for relational data"
 ```
 
+## Clean Source ZIP
+
+Prefer `git archive` when sharing source so ignored generated folders are excluded automatically:
+
+```bash
+git archive --format=zip --output avipack-source.zip HEAD
+```
+
+If creating a ZIP directly from the working tree, exclude generated and local-only folders:
+
+```bash
+zip -r avipack-source.zip . -x "node_modules/*" "*/node_modules/*" "dist/*" "*/dist/*" ".pnpm-store/*" "__MACOSX/*" ".git/*"
+```
+
 ## Roadmap Summary
 
 - Phase 0: repository foundation, docs, CLI stubs, templates, bot manifests.

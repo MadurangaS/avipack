@@ -45,6 +45,20 @@ pnpm test
 
 The test suite uses temporary directories and does not write test projects into the repository root.
 
+## Create a Clean Source ZIP
+
+Use Git to archive only tracked source:
+
+```bash
+git archive --format=zip --output avipack-source.zip HEAD
+```
+
+For a direct working-tree ZIP, exclude generated folders:
+
+```bash
+zip -r avipack-source.zip . -x "node_modules/*" "*/node_modules/*" "dist/*" "*/dist/*" ".pnpm-store/*" "__MACOSX/*" ".git/*"
+```
+
 ## Initialize a Project
 
 The first working MVP feature is `avipack init` with the `generic-brain-only` template.

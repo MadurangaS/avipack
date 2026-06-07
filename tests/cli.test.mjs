@@ -53,6 +53,30 @@ test("avipack bot enable brain updates config", async () => {
   assert.match(config, /avipack\.bot\.brain/);
 });
 
+test("avipack bot add brain --enable after install enables it", async () => {
+  const cwd = await tempProject();
+  await runCli(["init", "--name", "AddEnableCliApp"], cwd);
+  await runCli(["bot", "add", "brain"], cwd);
+  const { stdout } = await runCli(["bot", "add", "brain", "--enable"], cwd);
+
+  const config = await readFile(join(cwd, "avipack.config.yaml"), "utf8");
+  assert.match(stdout, /enabled by explicit flag/);
+  assert.match(config, /enabled:\n\s+- avipack\.bot\.brain/);
+});
+
+test("avipack bot disable brain before install fails cleanly", async () => {
+  const cwd = await tempProject();
+  await runCli(["init", "--name", "DisableBeforeInstallCliApp"], cwd);
+
+  await assert.rejects(
+    () => runCli(["bot", "disable", "brain"], cwd),
+    (error) => {
+      assert.match(error.stderr, /AviBrain is not installed/);
+      return true;
+    }
+  );
+});
+
 test("avipack bot run brain --dry-run does not write", async () => {
   const cwd = await tempProject();
   await runCli(["init", "--name", "RunDryCliApp"], cwd);
@@ -84,4 +108,17 @@ test("avipack brain check passes after init", async () => {
   const { stdout } = await runCli(["brain", "check"], cwd);
 
   assert.match(stdout, /Status: passed/);
+});
+
+test("avipack brain check --report outside project does not create .avipack", async () => {
+  const cwd = await tempProject();
+
+  await assert.rejects(
+    () => runCli(["brain", "check", "--report"], cwd),
+    (error) => {
+      assert.match(error.stdout, /Report was not written because this is not an Avipack project/);
+      return true;
+    }
+  );
+  assert.equal(existsSync(join(cwd, ".avipack")), false);
 });

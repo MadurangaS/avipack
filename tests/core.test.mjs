@@ -7,6 +7,7 @@ import test from "node:test";
 import {
   addInstalledBot,
   adoptProject,
+  BotNotInstalledError,
   checkBrain,
   createAdr,
   createBrain,
@@ -91,6 +92,30 @@ test("bot state install, enable, and disable works", async () => {
   });
 });
 
+test("bot add with enable enables an already installed disabled bot", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "BotEnableAddApp" });
+
+  await addInstalledBot("brain", { cwd });
+  const result = await addInstalledBot("brain", { cwd, enable: true });
+
+  assert.equal(result.status, "already-installed-enabled");
+  assert.deepEqual(getBotState(cwd), {
+    installed: ["avipack.bot.brain"],
+    enabled: ["avipack.bot.brain"]
+  });
+
+  const alreadyEnabled = await addInstalledBot("brain", { cwd, enable: true });
+  assert.equal(alreadyEnabled.status, "already-installed-already-enabled");
+});
+
+test("bot disable before install fails cleanly", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "BotDisableBeforeInstallApp" });
+
+  await assert.rejects(() => disableBot("brain", { cwd }), BotNotInstalledError);
+});
+
 test("brain check catches missing files", async () => {
   const cwd = await tempProject();
   const result = checkBrain(cwd);
@@ -98,6 +123,16 @@ test("brain check catches missing files", async () => {
   assert.equal(result.passed, false);
   assert.ok(result.missingFiles.length > 0);
   assert.ok(result.errors.length > 0);
+});
+
+test("brain check report outside Avipack project does not create .avipack", async () => {
+  const cwd = await tempProject();
+  const result = checkBrain({ cwd, report: true });
+
+  assert.equal(result.passed, false);
+  assert.equal(result.reportWritten, false);
+  assert.equal(existsSync(join(cwd, ".avipack")), false);
+  assert.match(result.reportMessage ?? "", /Run avipack init first/);
 });
 
 test("brain check catches invalid YAML", async () => {

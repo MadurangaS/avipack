@@ -48,7 +48,7 @@ export function registerBotCommand(program: Command): void {
     .action(async (botName: string, options: AddBotOptions) => {
       try {
         const result = await addInstalledBot(botName, { enable: options.enable });
-        console.log(result.status === "already-installed" ? "Avipack bot already installed." : "Avipack bot added.");
+        console.log(formatAddStatus(result.status));
         printBotResult(result.bot.name, result.reportPath);
       } catch (error) {
         printBotError(error);
@@ -110,6 +110,19 @@ export function registerBotCommand(program: Command): void {
         printBotError(error);
       }
     });
+}
+
+function formatAddStatus(status: string): string {
+  switch (status) {
+    case "already-installed":
+      return "Avipack bot already installed.";
+    case "already-installed-enabled":
+      return "Avipack bot already installed; enabled by explicit flag.";
+    case "already-installed-already-enabled":
+      return "Avipack bot already installed and already enabled.";
+    default:
+      return "Avipack bot added.";
+  }
 }
 
 function printBotResult(botName: string, reportPath?: string): void {
