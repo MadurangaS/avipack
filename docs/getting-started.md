@@ -13,13 +13,14 @@ During local development, use pnpm:
 ```bash
 pnpm install
 pnpm build
+node packages/cli/dist/index.js init --name demo-project
 ```
 
 If `pnpm` is not installed directly, use Node.js Corepack:
 
 ```bash
 corepack pnpm install
-corepack pnpm -r build
+corepack pnpm build
 ```
 
 ## Local Development
@@ -59,6 +60,8 @@ npx avipack init --name demo-project
 ```
 
 npm publishing is future work.
+
+The MVP template is bundled inside `@avipack/core`, which keeps local CLI behavior closer to future npm-installed behavior.
 
 ## Overwrite Behavior
 

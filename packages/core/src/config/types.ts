@@ -5,6 +5,7 @@ export interface AvipackConfig {
     template: string;
   };
   brain: {
+    root: string;
     path: string;
   };
   bots: {

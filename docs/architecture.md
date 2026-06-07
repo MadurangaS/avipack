@@ -28,7 +28,9 @@ flowchart TD
 
 ## Template Layer
 
-`packages/templates` stores starter pack assets. The first complete template is `generic-brain-only`.
+The MVP generic template is bundled inside `@avipack/core` under `packages/core/templates`. This lets the installed core package resolve the working `generic-brain-only` template without depending on the monorepo root.
+
+`packages/templates` remains a workspace area for future starter-pack documentation and expansion. Future starter packs may become separate packages once template packaging and versioning need to scale.
 
 ## Bot Plugin Layer
 

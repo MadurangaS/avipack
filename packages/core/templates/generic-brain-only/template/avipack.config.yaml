@@ -4,7 +4,8 @@ project:
   template: generic-brain-only
 
 brain:
-  path: .avipack
+  root: .avipack
+  path: .avipack/brain
 
 bots:
   enabled: []

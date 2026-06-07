@@ -12,8 +12,8 @@ If the direct `pnpm` command is unavailable, use:
 
 ```bash
 corepack pnpm install
-corepack pnpm -r typecheck
-corepack pnpm -r build
+corepack pnpm typecheck
+corepack pnpm build
 ```
 
 ## Coding Style
@@ -29,7 +29,8 @@ corepack pnpm -r build
 - `packages/cli`: command definitions.
 - `packages/core`: reusable project brain, config, template, and bot primitives.
 - `packages/bot-*`: optional bot packages.
-- `packages/templates`: starter pack files.
+- `packages/core/templates`: active MVP templates bundled with `@avipack/core`.
+- `packages/templates`: future starter-pack workspace and documentation.
 
 ## Add a Command
 
@@ -48,7 +49,7 @@ corepack pnpm -r build
 
 ## Add a Starter Pack
 
-1. Create a folder under `packages/templates`.
+1. Create a folder under `packages/templates` for future starter documentation, or `packages/core/templates` for templates that must ship with `@avipack/core`.
 2. Add a README.
 3. Add template files under `template/` when scaffolded.
 4. Register it in `templateRegistry.ts`.

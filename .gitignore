@@ -4,6 +4,8 @@ dist
 .DS_Store
 __MACOSX
 *.log
+*.tsbuildinfo
+.pnpm-store
 coverage/
 .env
 .env.*

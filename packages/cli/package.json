@@ -6,6 +6,11 @@
   "bin": {
     "avipack": "dist/index.js"
   },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"

@@ -11,11 +11,12 @@
 ## Phase 1 - Working CLI MVP
 
 - `avipack init` with `generic-brain-only` template: implemented.
+- Core-bundled template resolution: implemented.
 - Brain file generation: implemented for MVP template.
 - Basic template variables: implemented for project name.
 - Basic brain check: implemented for required MVP files.
 - `avipack adopt`: pending.
-- Advanced validation: pending.
+- Advanced conflict engine: pending.
 - Additional starter packs: pending.
 
 ## Phase 2 - Bot Plugin MVP

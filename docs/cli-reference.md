@@ -25,6 +25,14 @@ Overwrite behavior: without `--force`, the command refuses to continue if `.avip
 
 Current MVP behavior: copies the `generic-brain-only` template into the current directory, updates project metadata, runs a basic brain check, and prints a success summary.
 
+Generated files include `.avipack/`, `avipack.config.yaml`, and `README.md`. The generated config distinguishes the Avipack root from the brain file directory:
+
+```yaml
+brain:
+  root: .avipack
+  path: .avipack/brain
+```
+
 Future behavior: support additional starter packs, richer template variables, stricter validation, and safer adoption flows for existing projects.
 
 ## `avipack adopt`

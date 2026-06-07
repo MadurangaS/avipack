@@ -22,6 +22,8 @@ The core idea is simple: the project should carry its own memory. Humans and AI 
 
 `avipack init` can now generate a generic Avipack Brain in the current directory.
 
+`avipack init` now uses the core-bundled `generic-brain-only` template from `@avipack/core`. This is a stabilization step toward npm-installable usage because the working template no longer depends on the monorepo-level starter workspace.
+
 After building the CLI locally:
 
 ```bash
@@ -132,8 +134,8 @@ If `pnpm` is not available but Node.js Corepack is installed, enable pnpm first 
 
 ```bash
 corepack pnpm install
-corepack pnpm -r typecheck
-corepack pnpm -r build
+corepack pnpm typecheck
+corepack pnpm build
 ```
 
 ## Roadmap Summary

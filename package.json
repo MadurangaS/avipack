@@ -6,8 +6,8 @@
   "type": "module",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "build": "corepack pnpm -r build",
-    "typecheck": "corepack pnpm -r typecheck",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
     "lint": "echo \"lint not configured yet\"",
     "test": "echo \"tests not configured yet\""
   },
