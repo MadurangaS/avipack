@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Avipack Requirements",
+  "type": "object",
+  "required": ["requirements"],
+  "properties": {
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "status", "description"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^REQ-[0-9]{3,}$" },
+          "title": { "type": "string" },
+          "status": { "type": "string" },
+          "priority": { "type": "string" },
+          "description": { "type": "string" },
+          "traces": { "type": "object" }
+        }
+      }
+    }
+  }
+}

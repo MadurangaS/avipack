@@ -1,0 +1,16 @@
+rules:
+  no_secrets_in_brain:
+    description: Brain files must not contain API keys, passwords, private certificates, or production credentials.
+    severity: critical
+
+  manual_bot_execution:
+    description: Bots must run only through explicit owner-controlled commands.
+    severity: high
+
+  permission_limited_bots:
+    description: Bots may only write inside their declared permission scopes.
+    severity: high
+
+  no_background_execution_by_default:
+    description: No daemon, scheduled job, Git hook, or CI workflow may run bots unless explicitly enabled.
+    severity: high

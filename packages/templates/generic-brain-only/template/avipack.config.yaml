@@ -1,0 +1,10 @@
+project:
+  id: sample-project
+  name: Sample Project
+  template: generic-brain-only
+
+brain:
+  path: .avipack
+
+bots:
+  enabled: []

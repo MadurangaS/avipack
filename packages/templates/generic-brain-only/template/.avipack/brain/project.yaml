@@ -1,0 +1,17 @@
+project:
+  id: sample-project
+  name: Sample Project
+  version: 0.1.0
+  type: generic
+  created_by: avipack
+  stack:
+    language: unknown
+    framework: unknown
+    database: unknown
+
+governance:
+  requirement_versioning: true
+  architecture_decision_records: true
+  change_request_tracking: true
+  ai_agent_control: true
+  conflict_detection: planned

@@ -1,0 +1,30 @@
+requirements:
+  - id: REQ-001
+    title: Project brain must be created
+    status: accepted
+    priority: high
+    description: The project must contain an Avipack Brain folder with structured project memory.
+    traces:
+      architecture: [ARCH-001]
+      tests: [TEST-001]
+      changes: [CR-0001]
+
+  - id: REQ-002
+    title: Requirements must be versioned
+    status: accepted
+    priority: high
+    description: Requirements must use stable IDs so changes can be reviewed and traced over time.
+    traces:
+      architecture: [ARCH-002]
+      tests: [TEST-002]
+      changes: [CR-0001]
+
+  - id: REQ-003
+    title: Bots must run only by explicit command
+    status: accepted
+    priority: high
+    description: Bots must not run silently or modify the project without an owner-controlled command.
+    traces:
+      architecture: [ARCH-003]
+      tests: [TEST-003]
+      changes: [CR-0001]

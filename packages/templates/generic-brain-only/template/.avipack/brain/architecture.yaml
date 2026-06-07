@@ -1,0 +1,21 @@
+system_overview:
+  id: ARCH-001
+  summary: The project keeps operational context in .avipack and treats it as the source of truth for scope and decisions.
+
+modules:
+  - id: ARCH-002
+    name: project-brain
+    responsibility: Stores requirements, architecture notes, testing strategy, security rules, glossary, ADRs, and change requests.
+  - id: ARCH-003
+    name: agent-control
+    responsibility: Defines rules and permissions for human-guided coding agents and optional bots.
+
+boundaries:
+  - Brain files may describe application behavior but should not contain secrets.
+  - Bots and agents must follow the write scopes documented in the project brain.
+  - Architecture changes require ADR updates.
+
+future_extensions:
+  - Automated conflict checks between requirements, architecture, tests, and implementation.
+  - Bot permission enforcement.
+  - CI checks for brain consistency.

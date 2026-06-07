@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Avipack Change Request",
+  "type": "object",
+  "required": ["id", "status", "summary"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^CR-[0-9]{4,}$" },
+    "status": { "type": "string" },
+    "summary": { "type": "string" },
+    "linked_requirements": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "impact": { "type": "string" }
+  }
+}

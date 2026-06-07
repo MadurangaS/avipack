@@ -1,0 +1,18 @@
+{
+  "name": "avipack",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-ready project starter and project-brain system for controlled human and AI software development.",
+  "type": "module",
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "echo \"lint not configured yet\"",
+    "test": "echo \"tests not configured yet\""
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.3"
+  }
+}

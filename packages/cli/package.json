@@ -1,0 +1,20 @@
+{
+  "name": "avipack",
+  "version": "0.1.0",
+  "description": "Avipack command-line interface.",
+  "type": "module",
+  "bin": {
+    "avipack": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@avipack/core": "workspace:*",
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,23 @@
+entities:
+  - name: Requirement
+    description: A stable, versioned statement of expected behavior or project constraint.
+    key_fields: [id, title, status, priority, traces]
+
+  - name: Architecture Decision Record
+    description: A durable explanation of a significant architectural choice.
+    key_fields: [id, status, context, decision, consequences]
+
+  - name: Change Request
+    description: A tracked proposal to alter scope, requirements, or architecture.
+    key_fields: [id, status, summary, impact, linked_requirements]
+
+relationships:
+  - from: Requirement
+    to: Architecture Decision Record
+    type: informs
+  - from: Change Request
+    to: Requirement
+    type: modifies
+  - from: Requirement
+    to: Test
+    type: verified_by

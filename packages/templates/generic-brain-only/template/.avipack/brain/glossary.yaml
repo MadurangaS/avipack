@@ -1,0 +1,8 @@
+terms:
+  Avipack: An AI-ready project starter and project-brain system.
+  Brain: The versioned .avipack project memory for requirements, architecture, changes, and agent rules.
+  Bot: An optional package that performs a scoped, owner-triggered project workflow.
+  Starter Pack: A template for creating a new project or adding Avipack Brain to an existing project.
+  ADR: Architecture Decision Record; a durable record of an important architecture decision.
+  Change Request: A tracked proposal for changing scope, requirements, or architecture.
+  Conflict Check: A validation process that looks for mismatches across requirements, architecture, APIs, tests, and implementation.

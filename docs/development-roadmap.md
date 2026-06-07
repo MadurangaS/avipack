@@ -1,0 +1,51 @@
+# Development Roadmap
+
+## Phase 0 - Repository Foundation
+
+- Documentation.
+- Monorepo structure.
+- CLI stubs.
+- Brain templates.
+- Bot manifests.
+
+## Phase 1 - Working CLI MVP
+
+- `avipack init`.
+- `avipack adopt`.
+- Brain file generation.
+- Config loading.
+- Basic brain check.
+
+## Phase 2 - Bot Plugin MVP
+
+- Install/list/enable/disable bots.
+- Manual bot execution.
+- Bot permission validation.
+
+## Phase 3 - Conflict Engine
+
+- Requirement validation.
+- Architecture mismatch detection.
+- API/test mapping.
+- Report generation.
+
+## Phase 4 - Starter Pack Expansion
+
+- Next.js starter.
+- Node API starter.
+- FastAPI starter.
+- Template variables.
+
+## Phase 5 - IDE and GitHub Integration
+
+- VS Code extension concept.
+- GitHub Actions checks.
+- PR brain validation.
+- Optional Git hooks.
+
+## Phase 6 - Commercial/Product Layer
+
+- Team dashboard.
+- Hosted brain reports.
+- Organization templates.
+- Governance and audit trail.

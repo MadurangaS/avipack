@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Avipack Architecture",
+  "type": "object",
+  "required": ["system_overview", "modules", "boundaries", "future_extensions"],
+  "properties": {
+    "system_overview": { "type": "object" },
+    "modules": { "type": "array" },
+    "boundaries": { "type": "array" },
+    "future_extensions": { "type": "array" }
+  }
+}
