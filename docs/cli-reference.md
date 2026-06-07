@@ -6,15 +6,26 @@ All commands are owner-controlled and safe by default in the foundation stage.
 
 Purpose: Create a new Avipack-ready project foundation.
 
-Example:
+Options:
+
+- `--template <template>`: starter template to use. Defaults to `generic-brain-only`.
+- `--name <name>`: project name to write into generated brain files. Defaults to the current folder name.
+- `--force`: overwrite known Avipack-generated targets.
+
+Examples:
 
 ```bash
-avipack init --template generic-brain-only
+avipack init
+avipack init --name solar-monitoring-system
+avipack init --template generic-brain-only --name solar-monitoring-system
+avipack init --force --name solar-monitoring-system
 ```
 
-Current MVP behavior: prints planned generation output.
+Overwrite behavior: without `--force`, the command refuses to continue if `.avipack`, `avipack.config.yaml`, or `README.md` already exists. With `--force`, the MVP replaces only those known Avipack-generated top-level targets.
 
-Future behavior: copy starter files, apply template variables, and create config.
+Current MVP behavior: copies the `generic-brain-only` template into the current directory, updates project metadata, runs a basic brain check, and prints a success summary.
+
+Future behavior: support additional starter packs, richer template variables, stricter validation, and safer adoption flows for existing projects.
 
 ## `avipack adopt`
 

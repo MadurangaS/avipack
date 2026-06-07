@@ -18,20 +18,40 @@ The core idea is simple: the project should carry its own memory. Humans and AI 
 - **Bots**: optional plugin packages that perform manual, scoped workflows.
 - **Conflict Checks**: planned validation between requirements, architecture, APIs, tests, and implementation.
 
+## First Working MVP Feature
+
+`avipack init` can now generate a generic Avipack Brain in the current directory.
+
+After building the CLI locally:
+
+```bash
+node packages/cli/dist/index.js init --name my-project
+```
+
+This creates:
+
+```txt
+.avipack/
+avipack.config.yaml
+README.md
+```
+
+By default, Avipack refuses to overwrite an existing `.avipack`, `avipack.config.yaml`, or `README.md`. Use `--force` only when you intentionally want to replace Avipack-generated files.
+
 ## Quick Start
 
-The repository is currently in foundation mode. After dependencies are installed, the intended local workflow is:
+After dependencies are installed, the local workflow is:
 
 ```bash
 pnpm install
 pnpm build
-pnpm --filter avipack exec avipack --help
+node packages/cli/dist/index.js init --name demo-project
 ```
 
 Future user-facing usage:
 
 ```bash
-npx avipack init
+npx avipack init --name demo-project
 npx avipack adopt
 npx avipack brain check
 ```
@@ -53,7 +73,7 @@ avipack change new
 avipack adr new
 ```
 
-Current behavior is intentionally safe. Commands print professional placeholder output and avoid autonomous file modification until the Phase 1 implementation.
+`avipack init` is implemented for the `generic-brain-only` template. Other commands remain safe placeholders until their milestones.
 
 ## Brain Folder Overview
 
@@ -119,7 +139,7 @@ corepack pnpm -r build
 ## Roadmap Summary
 
 - Phase 0: repository foundation, docs, CLI stubs, templates, bot manifests.
-- Phase 1: working CLI MVP with brain generation and basic checks.
+- Phase 1: working CLI MVP started with `avipack init`, brain generation, and basic checks.
 - Phase 2: bot plugin lifecycle.
 - Phase 3: conflict engine.
 - Phase 4: starter pack expansion.
@@ -128,4 +148,4 @@ corepack pnpm -r build
 
 ## Current Status
 
-Avipack is in foundation/MVP planning stage. The repository establishes structure, documentation, command design, templates, and safe TypeScript stubs.
+Avipack is in early MVP stage. The repository establishes structure, documentation, command design, templates, safe TypeScript stubs, and a working `avipack init` flow for the generic brain-only template.

@@ -13,7 +13,7 @@ export interface AvipackConfig {
 }
 
 export interface BrainCheckResult {
-  status: "ok" | "missing";
-  checkedPath: string;
-  missingPaths: string[];
+  passed: boolean;
+  checkedFiles: string[];
+  missingFiles: string[];
 }

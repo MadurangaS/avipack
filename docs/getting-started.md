@@ -38,13 +38,43 @@ pnpm build
 
 ## Initialize a Project
 
-Future behavior:
+The first working MVP feature is `avipack init` with the `generic-brain-only` template.
 
 ```bash
-avipack init --template generic-brain-only
+node packages/cli/dist/index.js init --name demo-project
 ```
 
-This will copy the brain template into the target project and create `avipack.config.yaml`.
+This copies the brain template into the current directory and creates:
+
+```txt
+.avipack/
+avipack.config.yaml
+README.md
+```
+
+Future published usage:
+
+```bash
+npx avipack init --name demo-project
+```
+
+npm publishing is future work.
+
+## Overwrite Behavior
+
+By default, `avipack init` refuses to overwrite:
+
+```txt
+.avipack/
+avipack.config.yaml
+README.md
+```
+
+Use `--force` only when you intentionally want to replace Avipack-generated files:
+
+```bash
+node packages/cli/dist/index.js init --name demo-project --force
+```
 
 ## Adopt an Existing Project
 

@@ -12,19 +12,13 @@ export function registerBrainCommand(program: Command): void {
 
       console.log("Avipack Brain Check");
       console.log("");
-      console.log("Status: foundation mode");
-      console.log(
-        `Result: ${
-          result.status === "ok"
-            ? "basic structure validation completed"
-            : "basic structure validation found missing files"
-        }`
-      );
+      console.log(`Status: ${result.passed ? "passed" : "failed"}`);
+      console.log(`Files checked: ${result.checkedFiles.length}`);
 
-      if (result.missingPaths.length > 0) {
+      if (result.missingFiles.length > 0) {
         console.log("Missing:");
-        for (const missingPath of result.missingPaths) {
-          console.log(`- ${missingPath}`);
+        for (const missingPath of result.missingFiles) {
+          console.log(`  - ${missingPath}`);
         }
       }
 
