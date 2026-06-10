@@ -2,7 +2,7 @@ import { rm, readdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
-const generatedPaths = ["coverage"];
+const generatedPaths = ["coverage", ".release", "__MACOSX"];
 const packageRoot = "packages";
 
 if (existsSync(packageRoot)) {

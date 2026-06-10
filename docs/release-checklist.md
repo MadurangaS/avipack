@@ -10,6 +10,8 @@ pnpm install
 pnpm typecheck
 pnpm build
 pnpm test
+pnpm release:pack
+pnpm release:smoke
 pnpm verify
 ```
 
@@ -30,11 +32,30 @@ avipack adr new --title "Release checklist decision"
 ## Packaging Checks
 
 ```bash
-pnpm pack:cli
-tar -tzf packages/cli/avipack-0.1.0.tgz
+pnpm release:pack
+tar -tzf .release/avipack-core-0.1.0.tgz
+tar -tzf .release/avipack-0.1.0.tgz
+tar -xOf .release/avipack-0.1.0.tgz package/package.json
 ```
 
-Confirm the package contains the CLI `dist/`, `package.json`, and `README.md`.
+Confirm the core package contains `dist/`, `templates/`, `package.json`, and `README.md`.
+
+Confirm the CLI package contains `dist/`, `package.json`, and `README.md`.
+
+Confirm the packed CLI package uses a normal `@avipack/core` version range, not `workspace:*`.
+
+## Release Smoke Test
+
+```bash
+pnpm release:smoke
+```
+
+The smoke test installs both local tarballs into a clean temporary npm prefix and runs:
+
+- `avipack --help`
+- `avipack init --name InstallSmoke`
+- `avipack doctor`
+- `avipack brain check`
 
 Confirm it does not contain generated or local-only folders:
 
@@ -42,8 +63,10 @@ Confirm it does not contain generated or local-only folders:
 - unrelated package `dist` folders
 - `.pnpm-store`
 - `coverage`
+- `.release`
 - `__MACOSX`
 - `.DS_Store`
+- `*.tgz`
 - test temp files
 
 ## Git Hygiene
@@ -61,6 +84,7 @@ Do not commit:
 - `dist`
 - `.pnpm-store`
 - `coverage`
+- `.release`
 - `__MACOSX`
 - `.DS_Store`
 - `*.tgz`
@@ -70,8 +94,8 @@ Do not commit:
 Before publishing publicly:
 
 1. Finalize license, author, and repository metadata.
-2. Publish or otherwise package `@avipack/core`.
-3. Verify `npm install -g avipack` from a clean environment.
+2. Publish `@avipack/core` before `avipack`, or keep using the coordinated two-tarball local workflow.
+3. Verify `npm install -g avipack` from a clean environment after public publishing exists.
 4. Inspect tarball contents.
 5. Run manual CLI checks from a separate folder.
 6. Confirm no AI provider, background service, or autonomous bot behavior was added unintentionally.

@@ -1,6 +1,6 @@
 # Product Vision
 
-Avipack is an AI-ready project starter and project-brain system. It keeps project context, scope, requirements, and decisions controlled from day one.
+Avipack is a local-first project starter and project-brain system for AI-assisted development. It keeps project context, scope, requirements, and decisions controlled from day one.
 
 ## Problem
 
@@ -8,7 +8,7 @@ Software projects lose context quickly. Requirements drift, architecture decisio
 
 ## Difference From Normal Project Starters
 
-Normal starters generate an app skeleton. Avipack generates an operating system for the project: requirements, ADRs, change tracking, agent rules, schemas, reports, and a roadmap for validation.
+Normal starters generate an app skeleton. The current Avipack CLI generates and validates a local project brain: requirements, ADRs, change tracking, agent rules, schemas, and reports. Future milestones may add deeper conflict analysis and broader starter packs.
 
 ## Difference From AI Prompt Files
 
@@ -32,7 +32,7 @@ Avipack lets teams and solo developers start with professional governance withou
 
 ## MVP Scope
 
-The MVP focuses on local CLI behavior, brain generation, basic validation, starter templates, and manual bot stubs.
+The MVP focuses on local CLI behavior, brain generation, structured validation, local release packaging, starter templates, and manual report-only bot stubs.
 
 ## Long-Term Direction
 

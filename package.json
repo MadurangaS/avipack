@@ -24,8 +24,10 @@
     "typecheck": "pnpm --filter @avipack/core build && pnpm -r typecheck",
     "lint": "tsc -p packages/core/tsconfig.json --noEmit && tsc -p packages/cli/tsconfig.json --noEmit",
     "test": "pnpm build && node --test tests/*.test.mjs",
-    "pack:cli": "node scripts/pack-cli.mjs",
-    "verify": "pnpm clean && pnpm typecheck && pnpm build && pnpm test && node scripts/pack-cli.mjs --dry-run"
+    "pack:cli": "pnpm release:pack",
+    "release:pack": "pnpm build && node scripts/release-pack.mjs",
+    "release:smoke": "pnpm release:pack && node scripts/release-smoke.mjs",
+    "verify": "pnpm clean && pnpm typecheck && pnpm build && pnpm test && pnpm release:smoke && pnpm clean"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

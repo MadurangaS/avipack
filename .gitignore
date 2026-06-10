@@ -8,6 +8,7 @@ __MACOSX
 *.tsbuildinfo
 .pnpm-store
 coverage/
+.release/
 .env
 .env.*
 !.env.example

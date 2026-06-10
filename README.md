@@ -1,8 +1,8 @@
 # Avipack
 
-Avipack is a CLI-based project starter and project-brain system for controlled human and AI software development.
+Avipack is a local CLI project starter and project-brain system for controlled human and AI-assisted software development.
 
-It creates or adopts projects with a clean starter structure, a versioned project brain, structured requirements, ADRs, change requests, agent rules, optional bot packages, and future conflict checking between requirements, architecture, APIs, tests, and implementation.
+The current release candidate creates or adopts projects with a versioned project brain, structured requirements, ADRs, change requests, agent rules, manual bot state, governance validation, and local reports. Deeper conflict checking between requirements, architecture, APIs, tests, and implementation is planned for future milestones.
 
 ## Why Avipack Exists
 
@@ -50,13 +50,11 @@ pnpm build
 node packages/cli/dist/index.js init --name demo-project
 ```
 
-Future user-facing usage:
+Current package-style usage after release tarballs are created:
 
 ```bash
-npx avipack init --name demo-project
-npx avipack adopt
-npx avipack brain check
-npx avipack brain check --json
+pnpm release:pack
+pnpm release:smoke
 ```
 
 Current local CLI usage after building:
@@ -99,7 +97,7 @@ avipack doctor
 avipack version
 ```
 
-`avipack init` and `avipack adopt` are implemented for the `generic-brain-only` template. Bot lifecycle commands, structured governance brain checks, change request generation, and ADR generation now have local MVP behavior.
+`avipack init` and `avipack adopt` are implemented for the `generic-brain-only` template. Bot lifecycle commands, structured governance brain checks, change request generation, ADR generation, local release packing, and release smoke installation now have local MVP behavior.
 
 ## Brain Folder Overview
 
@@ -183,14 +181,17 @@ node /path/to/avipack/packages/cli/dist/index.js change new --title "Add authent
 node /path/to/avipack/packages/cli/dist/index.js adr new --title "Use PostgreSQL for relational data"
 ```
 
-Local packaging checks:
+Local release packaging checks:
 
 ```bash
 pnpm clean
-pnpm build
-pnpm pack:cli
-tar -tzf packages/cli/avipack-0.1.0.tgz
+pnpm release:pack
+pnpm release:smoke
+tar -tzf .release/avipack-0.1.0.tgz
+tar -tzf .release/avipack-core-0.1.0.tgz
 ```
+
+`release:pack` creates installable local tarballs for both `@avipack/core` and `avipack`. The CLI release tarball is staged with a normal `@avipack/core` version range so it does not expose `workspace:*` dependencies.
 
 Avipack is not published to npm yet. There is no hosted service, LLM provider integration, autonomous bot execution, background daemon, scheduler, Git hook execution, or sprint diff enforcement in this milestone.
 
@@ -205,7 +206,7 @@ git archive --format=zip --output avipack-source.zip HEAD
 If creating a ZIP directly from the working tree, exclude generated and local-only folders:
 
 ```bash
-zip -r avipack-source.zip . -x "node_modules/*" "*/node_modules/*" "dist/*" "*/dist/*" ".pnpm-store/*" "__MACOSX/*" ".git/*"
+zip -r avipack-source.zip . -x "node_modules/*" "*/node_modules/*" "dist/*" "*/dist/*" ".pnpm-store/*" ".release/*" "__MACOSX/*" ".git/*" "*.tgz" ".DS_Store"
 ```
 
 ## Roadmap Summary
