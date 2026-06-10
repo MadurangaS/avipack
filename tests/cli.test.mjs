@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile } from "node:fs/promises";
+import { mkdtemp, readFile, readdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
@@ -12,6 +12,25 @@ const cliPath = resolve("packages/cli/dist/index.js");
 
 async function tempProject(prefix = "avipack-cli-") {
   return mkdtemp(join(tmpdir(), prefix));
+}
+
+async function listRelativeFiles(root, relativeDir = ".") {
+  const absoluteDir = join(root, relativeDir);
+  if (!existsSync(absoluteDir)) {
+    return [];
+  }
+
+  const entries = await readdir(absoluteDir, { withFileTypes: true });
+  const files = [];
+  for (const entry of entries) {
+    const relativePath = relativeDir === "." ? entry.name : `${relativeDir}/${entry.name}`;
+    if (entry.isDirectory()) {
+      files.push(...(await listRelativeFiles(root, relativePath)));
+    } else if (entry.isFile()) {
+      files.push(relativePath);
+    }
+  }
+  return files.sort();
 }
 
 async function runCli(args, cwd) {
@@ -154,9 +173,40 @@ test("avipack bot run brain --dry-run does not write", async () => {
   const cwd = await tempProject();
   await runCli(["init", "--name", "RunDryCliApp"], cwd);
   await runCli(["bot", "add", "brain", "--enable"], cwd);
+  const beforeFiles = await listRelativeFiles(cwd);
   const { stdout } = await runCli(["bot", "run", "brain", "--dry-run"], cwd);
+  const afterFiles = await listRelativeFiles(cwd);
 
-  assert.match(stdout, /dry run/);
+  assert.match(stdout, /Avipack Bot Run/);
+  assert.match(stdout, /Mode: dry-run/);
+  assert.match(stdout, /Files written: 0/);
+  assert.deepEqual(afterFiles, beforeFiles);
+});
+
+test("avipack bot run brain --apply writes approved artifacts", async () => {
+  const cwd = await tempProject();
+  await runCli(["init", "--name", "RunApplyCliApp"], cwd);
+  await runCli(["bot", "add", "brain", "--enable"], cwd);
+  const { stdout } = await runCli(["bot", "run", "brain", "--apply"], cwd);
+
+  assert.match(stdout, /Mode: apply/);
+  assert.match(stdout, /Files written: 2/);
+  assert.equal(existsSync(join(cwd, ".avipack/reports/bots")), true);
+  assert.equal(existsSync(join(cwd, ".avipack/drafts")), true);
+});
+
+test("avipack bot run rejects dry-run and apply together", async () => {
+  const cwd = await tempProject();
+  await runCli(["init", "--name", "RunConflictCliApp"], cwd);
+  await runCli(["bot", "add", "brain", "--enable"], cwd);
+
+  await assert.rejects(
+    () => runCli(["bot", "run", "brain", "--dry-run", "--apply"], cwd),
+    (error) => {
+      assert.match(error.stderr, /Use either --dry-run or --apply, not both/);
+      return true;
+    }
+  );
 });
 
 test("avipack change new creates CR-0002 file", async () => {

@@ -6,6 +6,7 @@ import {
   BotNotInstalledError,
   disableBot,
   enableBot,
+  InvalidBotRunModeError,
   listBotsWithState,
   runBot,
   UnknownBotError
@@ -17,6 +18,7 @@ interface AddBotOptions {
 
 interface RunBotOptions {
   dryRun?: boolean;
+  apply?: boolean;
   allowDisabled?: boolean;
 }
 
@@ -88,24 +90,18 @@ export function registerBotCommand(program: Command): void {
     .argument("<bot>", "bot name, id, or package")
     .description("Run a bot manually.")
     .option("--dry-run", "show what would happen without writing a report")
+    .option("--apply", "write approved .avipack workflow artifacts")
     .option("--allow-disabled", "allow manual run even when the bot is disabled")
     .action(async (botName: string, options: RunBotOptions) => {
       try {
-        const result = await runBot(botName, { dryRun: options.dryRun, allowDisabled: options.allowDisabled });
+        const result = await runBot(botName, { dryRun: options.dryRun, apply: options.apply, allowDisabled: options.allowDisabled });
 
-        if (result.status === "dry-run") {
-          console.log("Avipack bot run dry run.");
-          console.log("");
-          console.log(`Bot: ${result.bot.name}`);
-          console.log("Would create: .avipack/reports/bots/<timestamp>-run report");
-          console.log("No files were modified.");
-          return;
+        if (result.runResult) {
+          printBotRunResult(result.runResult);
+        } else {
+          console.log("Avipack bot run completed.");
+          printBotResult(result.bot.name, result.reportPath);
         }
-
-        console.log("Avipack bot run completed.");
-        printBotResult(result.bot.name, result.reportPath);
-        console.log("");
-        console.log("MVP Result: report written only; no AI analysis or application source changes were performed.");
       } catch (error) {
         printBotError(error);
       }
@@ -134,8 +130,61 @@ function printBotResult(botName: string, reportPath?: string): void {
   }
 }
 
+function printBotRunResult(result: {
+  botName: string;
+  mode: string;
+  projectName: string;
+  filesInspected: string[];
+  findings: string[];
+  warnings: string[];
+  plannedActions: string[];
+  appliedActions: string[];
+  filesWritten: string[];
+  blockedActions: string[];
+  reportPath?: string;
+  safetyStatement: string;
+}): void {
+  console.log("Avipack Bot Run");
+  console.log("");
+  console.log(`Bot: ${result.botName}`);
+  console.log(`Mode: ${result.mode}`);
+  console.log(`Project: ${result.projectName}`);
+  console.log(`Files inspected: ${result.filesInspected.length}`);
+  console.log(`Findings: ${result.findings.length}`);
+  console.log(`Warnings: ${result.warnings.length}`);
+  console.log(`Planned actions: ${result.plannedActions.length}`);
+  console.log(`Applied actions: ${result.appliedActions.length}`);
+  console.log(`Files written: ${result.filesWritten.length}`);
+
+  if (result.filesWritten.length > 0) {
+    console.log("Files:");
+    for (const file of result.filesWritten) {
+      console.log(`  - ${file}`);
+    }
+  }
+
+  if (result.reportPath) {
+    console.log(`Report: ${result.reportPath}`);
+  }
+
+  if (result.blockedActions.length > 0) {
+    console.log("Blocked actions:");
+    for (const action of result.blockedActions) {
+      console.log(`  - ${action}`);
+    }
+  }
+
+  console.log(`Safety: ${result.safetyStatement}`);
+}
+
 function printBotError(error: unknown): void {
-  if (error instanceof UnknownBotError || error instanceof AvipackProjectRequiredError || error instanceof BotNotInstalledError || error instanceof BotNotEnabledError) {
+  if (
+    error instanceof UnknownBotError ||
+    error instanceof AvipackProjectRequiredError ||
+    error instanceof BotNotInstalledError ||
+    error instanceof BotNotEnabledError ||
+    error instanceof InvalidBotRunModeError
+  ) {
     console.error(error.message);
   } else {
     console.error(error instanceof Error ? error.message : "Bot command failed.");

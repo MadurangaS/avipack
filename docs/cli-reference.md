@@ -126,6 +126,8 @@ Purpose: List known bots and project-local state.
 
 Current MVP behavior: prints each known bot with id, name, package name, installed state, enabled state, and description. If run outside an Avipack project, all bots show as not installed and not enabled.
 
+Bot product direction: bots are controlled workflow agents. The current CLI exposes manual lifecycle state and report-writing runs; Phase 2A will add controlled `.avipack` artifact generation without source-code modification.
+
 ## `avipack bot add <bot>`
 
 Purpose: Record a known bot as installed for the current Avipack project.
@@ -157,9 +159,12 @@ Purpose: Run a bot manually.
 Options:
 
 - `--dry-run`: show what would happen without writing a report.
+- `--apply`: write approved `.avipack` workflow artifacts.
 - `--allow-disabled`: allow a manual run even when the bot is disabled.
 
-Current MVP behavior: requires the bot to be installed and enabled by default, then writes a manual execution report under `.avipack/reports/bots/`. It does not perform AI analysis, call external APIs, install packages, run in the background, or modify application source files.
+Current MVP behavior: requires the bot to be installed and enabled by default, then runs through the shared workflow engine. Default report mode writes only a manual execution report under `.avipack/reports/bots/`. Dry-run mode writes nothing. Apply mode writes the report and approved generic workflow artifacts under safe `.avipack` paths.
+
+Bot runs remain manual and owner-controlled. They do not perform AI analysis, call external APIs, install packages, run in the background, or modify application source files. Bot-specific Phase 2A workflows are still planned; the current apply artifact is a generic safe-write foundation artifact.
 
 There is no autonomous or background bot execution in this milestone.
 

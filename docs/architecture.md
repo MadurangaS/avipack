@@ -8,8 +8,8 @@ flowchart TD
   CLI --> Core[Avipack Core]
   Core --> Brain[Avipack Brain]
   Core --> Templates[Starter Packs]
-  Core --> Bots[Optional Bot Plugins]
-  Bots --> Reports[Reports and Suggested Changes]
+  Core --> Bots[Controlled Bot Workflow Agents]
+  Bots --> Artifacts[Reports and Approved .avipack Artifacts]
 ```
 
 ## CLI Layer
@@ -25,7 +25,7 @@ flowchart TD
 - Existing project adoption and simple stack detection.
 - Project-local bot lifecycle state and report writing.
 - Change request and ADR file generation.
-- Bot manifest types and registry helpers.
+- Bot manifest types, registry helpers, and future controlled workflow primitives.
 - Starter template registry.
 - YAML validation.
 
@@ -43,9 +43,15 @@ Force mode is intentionally narrow: it may refresh `.avipack/` and `avipack.conf
 
 ## Bot Plugin Layer
 
-Bots live in separate packages. Each bot exports a manifest and a `run()` function. The CLI can discover and invoke bots later, but bot behavior should remain permission-scoped and explicit.
+Bots live in separate packages. Each bot exports a manifest and a `run()` function. The CLI can discover and invoke bots, but bot behavior should remain permission-scoped and explicit.
 
-The current local MVP does not install or execute real bot package behavior. It records installed/enabled bot state in `avipack.config.yaml` and writes audit or execution reports under `.avipack/reports/bots/`. Adding and enabling bots are explicit owner actions and never trigger execution.
+The current local MVP records installed/enabled bot state in `avipack.config.yaml` and writes audit or execution reports under `.avipack/reports/bots/`. Adding and enabling bots are explicit owner actions and never trigger execution.
+
+The Phase 2A foundation adds a shared workflow engine with report, dry-run, and apply modes plus safe-write validation for approved `.avipack` artifact paths. It can inspect local project context, write reports, and write generic approved workflow artifacts under `.avipack/`. Bot-specific workflow intelligence remains a later Phase 2A step.
+
+Phase 2A must block bot writes to application source code, tests, package scripts, public assets, docs, and any path outside approved `.avipack` locations.
+
+Future AI-powered or autonomous bot behavior is outside the current architecture and must be introduced only as opt-in, permission-scoped, auditable behavior.
 
 ## Brain Files
 
@@ -70,6 +76,8 @@ The v0.2 governance validation engine uses a small dependency-free validator in 
 
 - Template variable substitution.
 - Bot installation and enablement state.
+- Controlled bot workflow engine.
+- Safe `.avipack` artifact writes.
 - Permission validation.
 - Conflict reports.
 - CI and IDE integrations.

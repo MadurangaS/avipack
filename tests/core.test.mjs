@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -7,6 +7,7 @@ import test from "node:test";
 import {
   addInstalledBot,
   adoptProject,
+  BotNotEnabledError,
   BotNotInstalledError,
   checkBrain,
   createAdr,
@@ -15,13 +16,36 @@ import {
   disableBot,
   enableBot,
   getBotState,
+  InvalidBotRunModeError,
   loadConfig,
   normalizeConfig,
+  runBot,
+  UnknownBotError,
+  validateSafeBotWritePath,
   writeConfig
 } from "../packages/core/dist/index.js";
 
 async function tempProject(prefix = "avipack-core-") {
   return mkdtemp(join(tmpdir(), prefix));
+}
+
+async function listRelativeFiles(root, relativeDir = ".") {
+  const absoluteDir = join(root, relativeDir);
+  if (!existsSync(absoluteDir)) {
+    return [];
+  }
+
+  const entries = await readdir(absoluteDir, { withFileTypes: true });
+  const files = [];
+  for (const entry of entries) {
+    const relativePath = relativeDir === "." ? entry.name : `${relativeDir}/${entry.name}`;
+    if (entry.isDirectory()) {
+      files.push(...(await listRelativeFiles(root, relativePath)));
+    } else if (entry.isFile()) {
+      files.push(relativePath);
+    }
+  }
+  return files.sort();
 }
 
 test("createBrain creates required files", async () => {
@@ -114,6 +138,144 @@ test("bot disable before install fails cleanly", async () => {
   await createBrain({ cwd, projectName: "BotDisableBeforeInstallApp" });
 
   await assert.rejects(() => disableBot("brain", { cwd }), BotNotInstalledError);
+});
+
+test("safe bot write validation allows approved .avipack paths", async () => {
+  const cwd = await tempProject();
+
+  for (const path of [
+    ".avipack/reports/bots/run.md",
+    ".avipack/tasks/task.yaml",
+    ".avipack/plans/plan.md",
+    ".avipack/checklists/checklist.md",
+    ".avipack/drafts/draft.md",
+    ".avipack/decisions/drafts/adr.md",
+    ".avipack/changes/drafts/change.md",
+    ".avipack/brain/maintenance/health.yaml"
+  ]) {
+    const result = validateSafeBotWritePath(cwd, path);
+    assert.equal(result.ok, true, path);
+    assert.equal(result.relativePath, path);
+  }
+});
+
+test("safe bot write validation blocks application source paths", async () => {
+  const cwd = await tempProject();
+
+  for (const path of ["src/index.ts", "app/page.tsx", "packages/core/src/index.ts", "tests/core.test.mjs", "public/logo.png", "docs/plan.md"]) {
+    const result = validateSafeBotWritePath(cwd, path);
+    assert.equal(result.ok, false, path);
+    assert.match(result.reason ?? "", /blocked|approved/);
+  }
+});
+
+test("safe bot write validation blocks traversal and outside root paths", async () => {
+  const cwd = await tempProject();
+
+  const traversal = validateSafeBotWritePath(cwd, ".avipack/tasks/../reports/bots/run.md");
+  assert.equal(traversal.ok, false);
+  assert.match(traversal.reason ?? "", /path traversal/);
+
+  const outside = validateSafeBotWritePath(cwd, join(tmpdir(), "avipack-outside-report.md"));
+  assert.equal(outside.ok, false);
+  assert.match(outside.reason ?? "", /outside the project root/);
+});
+
+test("bot dry-run writes nothing and returns structured result", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "BotDryRunApp" });
+  await addInstalledBot("brain", { cwd, enable: true });
+  const beforeFiles = await listRelativeFiles(cwd);
+
+  const result = await runBot("brain", { cwd, dryRun: true });
+  const afterFiles = await listRelativeFiles(cwd);
+
+  assert.equal(result.status, "dry-run");
+  assert.equal(result.runResult.mode, "dry-run");
+  assert.equal(result.runResult.filesWritten.length, 0);
+  assert.equal(result.reportPath, undefined);
+  assert.deepEqual(afterFiles, beforeFiles);
+  assert.ok(result.runResult.plannedActions.length > 0);
+  assert.ok(result.runResult.safetyStatement.includes("manual"));
+});
+
+test("bot default report mode writes only report", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "BotReportApp" });
+  await addInstalledBot("brain", { cwd, enable: true });
+
+  const result = await runBot("brain", { cwd });
+
+  assert.equal(result.status, "ran");
+  assert.equal(result.runResult.mode, "report");
+  assert.equal(result.runResult.filesWritten.length, 1);
+  assert.equal(result.runResult.filesWritten[0], result.reportPath);
+  assert.match(result.reportPath, /^\.avipack\/reports\/bots\/run-brain-.+\.md$/);
+  assert.equal(existsSync(join(cwd, result.reportPath)), true);
+  assert.equal(existsSync(join(cwd, ".avipack/drafts")), false);
+});
+
+test("bot apply mode writes only approved .avipack artifacts", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "BotApplyApp" });
+  await addInstalledBot("brain", { cwd, enable: true });
+
+  const result = await runBot("brain", { cwd, apply: true });
+
+  assert.equal(result.status, "ran");
+  assert.equal(result.runResult.mode, "apply");
+  assert.equal(result.runResult.filesWritten.length, 2);
+  assert.ok(result.runResult.appliedActions.some((action) => action.includes("workflow draft")));
+  for (const file of result.runResult.filesWritten) {
+    assert.equal(validateSafeBotWritePath(cwd, file).ok, true);
+    assert.equal(existsSync(join(cwd, file)), true);
+  }
+});
+
+test("bot run mode rejects dry-run and apply together", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "BotModeConflictApp" });
+  await addInstalledBot("brain", { cwd, enable: true });
+
+  await assert.rejects(() => runBot("brain", { cwd, dryRun: true, apply: true }), InvalidBotRunModeError);
+});
+
+test("disabled bot cannot run unless allowDisabled is used", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "BotDisabledRunApp" });
+  await addInstalledBot("brain", { cwd });
+
+  await assert.rejects(() => runBot("brain", { cwd }), BotNotEnabledError);
+
+  const result = await runBot("brain", { cwd, allowDisabled: true });
+  assert.equal(result.status, "ran");
+  assert.equal(result.runResult.mode, "report");
+});
+
+test("unknown bot run fails cleanly", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "UnknownBotRunApp" });
+
+  await assert.rejects(() => runBot("unknown-bot", { cwd }), UnknownBotError);
+});
+
+test("bot run result includes required workflow fields", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "BotResultShapeApp" });
+  await addInstalledBot("brain", { cwd, enable: true });
+
+  const result = await runBot("brain", { cwd, apply: true });
+  const runResult = result.runResult;
+
+  assert.equal(runResult.botId, "avipack.bot.brain");
+  assert.equal(runResult.botName, "AviBrain");
+  assert.equal(runResult.projectName, "BotResultShapeApp");
+  assert.equal(runResult.mode, "apply");
+  assert.ok(Array.isArray(runResult.findings));
+  assert.ok(Array.isArray(runResult.plannedActions));
+  assert.ok(Array.isArray(runResult.appliedActions));
+  assert.ok(Array.isArray(runResult.filesWritten));
+  assert.ok(runResult.safetyStatement.length > 0);
 });
 
 test("brain check catches missing files", async () => {

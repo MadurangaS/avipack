@@ -9,8 +9,11 @@ export const knownBots: BotManifest[] = [
     description: "Maintains project requirements, scope, glossary, and project memory.",
     permissions: {
       read: [".avipack/**", "docs/**"],
-      write: [".avipack/brain/**", ".avipack/changes/**"]
-    }
+      write: [".avipack/brain/maintenance/**", ".avipack/tasks/**", ".avipack/checklists/**", ".avipack/reports/bots/**"]
+    },
+    supportsApply: true,
+    allowedActions: ["inspect-brain", "plan-maintenance", "write-avipack-artifacts"],
+    blockedActions: ["modify-source-code", "call-external-ai", "install-packages", "run-autonomously"]
   },
   {
     id: "avipack.bot.architect",
@@ -20,8 +23,11 @@ export const knownBots: BotManifest[] = [
     description: "Reviews architecture, ADRs, module boundaries, and impact analysis.",
     permissions: {
       read: [".avipack/**", "docs/**", "packages/**", "src/**"],
-      write: [".avipack/decisions/**", ".avipack/reports/**"]
-    }
+      write: [".avipack/decisions/drafts/**", ".avipack/plans/**", ".avipack/checklists/**", ".avipack/reports/bots/**"]
+    },
+    supportsApply: true,
+    allowedActions: ["inspect-architecture", "plan-architecture-review", "write-avipack-artifacts"],
+    blockedActions: ["modify-source-code", "rewrite-existing-adrs", "call-external-ai", "run-autonomously"]
   },
   {
     id: "avipack.bot.builder",
@@ -31,8 +37,11 @@ export const knownBots: BotManifest[] = [
     description: "Prepares implementation plans aligned to the project brain.",
     permissions: {
       read: [".avipack/**", "docs/**", "packages/**", "src/**"],
-      write: [".avipack/reports/**"]
-    }
+      write: [".avipack/plans/**", ".avipack/tasks/**", ".avipack/checklists/**", ".avipack/reports/bots/**"]
+    },
+    supportsApply: true,
+    allowedActions: ["inspect-implementation-context", "plan-implementation", "write-avipack-artifacts"],
+    blockedActions: ["modify-source-code", "create-tests", "change-package-scripts", "call-external-ai"]
   },
   {
     id: "avipack.bot.guard",
@@ -42,8 +51,11 @@ export const knownBots: BotManifest[] = [
     description: "Produces QA, test, review, and conflict reports.",
     permissions: {
       read: [".avipack/**", "docs/**", "packages/**", "src/**", "tests/**"],
-      write: [".avipack/reports/**"]
-    }
+      write: [".avipack/checklists/**", ".avipack/plans/**", ".avipack/tasks/**", ".avipack/reports/bots/**"]
+    },
+    supportsApply: true,
+    allowedActions: ["inspect-qa-context", "plan-risk-review", "write-avipack-artifacts"],
+    blockedActions: ["modify-source-code", "modify-tests", "change-ci", "call-external-ai"]
   }
 ];
 

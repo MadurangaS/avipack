@@ -2,7 +2,7 @@
 
 Avipack is a local CLI project starter and project-brain system for controlled human and AI-assisted software development.
 
-The current release candidate creates or adopts projects with a versioned project brain, structured requirements, ADRs, change requests, agent rules, manual bot state, governance validation, and local reports. Deeper conflict checking between requirements, architecture, APIs, tests, and implementation is planned for future milestones.
+The current release candidate creates or adopts projects with a versioned project brain, structured requirements, ADRs, change requests, agent rules, manual bot state, governance validation, and local reports. Controlled bot workflow agents, deeper conflict checking between requirements, architecture, APIs, tests, and implementation, and source-aware planning are planned for future milestones.
 
 ## Why Avipack Exists
 
@@ -15,7 +15,7 @@ The core idea is simple: the project should carry its own memory. Humans and AI 
 - **Avipack CLI**: the owner-controlled command line interface.
 - **Avipack Brain**: the `.avipack` folder that stores requirements, architecture, change requests, ADRs, security rules, testing strategy, and agent rules.
 - **Starter Packs**: templates for creating new projects or adding only the brain to existing projects.
-- **Bots**: optional plugin packages that perform manual, scoped workflows.
+- **Bots**: optional controlled workflow-agent packages that are manual, permission-scoped, owner-controlled, and local-first.
 - **Conflict Checks**: planned validation between requirements, architecture, APIs, tests, and implementation.
 
 ## First Working MVP Feature
@@ -118,9 +118,13 @@ The brain is the source of truth for project intent, requirements, architecture,
 
 ## Bot Overview
 
-Bots are separate packages and must be installed, enabled, and run under owner control. Installing a bot must not make it run automatically.
+Bots are separate packages and are intended to become controlled project workflow agents. They should eventually inspect, reason about, propose, generate, and maintain Avipack-managed artifacts while staying explicit, permission-scoped, owner-controlled, and local-first.
 
-In the current MVP, `avipack bot add <bot>` records the known bot in the project-local `avipack.config.yaml`; it does not install npm packages and does not run the bot. `avipack bot enable <bot>` only updates owner-controlled enabled state. `avipack bot run <bot>` is manual and writes an execution report under `.avipack/reports/bots/` without AI provider calls or application source changes.
+In the current MVP, `avipack bot add <bot>` records the known bot in the project-local `avipack.config.yaml`; it does not install npm packages and does not run the bot. `avipack bot enable <bot>` only updates owner-controlled enabled state. `avipack bot run <bot>` is manual and supports report, dry-run, and apply modes without AI provider calls or application source changes.
+
+The Phase 2A foundation now includes a shared workflow engine and safe-write model. Default bot runs write only execution reports under `.avipack/reports/bots/`; dry-runs write nothing; apply mode can write approved Avipack-managed artifacts under `.avipack/`, such as drafts and reports. Bot-specific maintenance intelligence is still planned for later Phase 2A steps. Phase 2A bots must not modify application source code, tests, package scripts, public assets, or other non-`.avipack` project files.
+
+Future AI-powered or autonomous capabilities are not part of the current release candidate or Phase 2A. Any future automation must remain opt-in, permission-scoped, auditable, and documented.
 
 Initial planned bots:
 
@@ -193,7 +197,7 @@ tar -tzf .release/avipack-core-0.1.0.tgz
 
 `release:pack` creates installable local tarballs for both `@avipack/core` and `avipack`. The CLI release tarball is staged with a normal `@avipack/core` version range so it does not expose `workspace:*` dependencies.
 
-Avipack is not published to npm yet. There is no hosted service, LLM provider integration, autonomous bot execution, background daemon, scheduler, Git hook execution, or sprint diff enforcement in this milestone.
+Avipack is not published to npm yet. There is no hosted service, LLM provider integration, autonomous bot execution, background daemon, scheduler, Git hook execution, source-code-modifying bot, or sprint diff enforcement in this milestone.
 
 ## Clean Source ZIP
 
@@ -212,13 +216,13 @@ zip -r avipack-source.zip . -x "node_modules/*" "*/node_modules/*" "dist/*" "*/d
 ## Roadmap Summary
 
 - Phase 0: repository foundation, docs, CLI stubs, templates, bot manifests.
-- Phase 1: working CLI MVP started with `avipack init`, brain generation, and basic checks.
-- Phase 2: bot plugin lifecycle.
-- Phase 3: conflict engine.
-- Phase 4: starter pack expansion.
-- Phase 5: IDE and GitHub integration.
-- Phase 6: commercial and hosted product layer.
+- Phase 1: CLI foundation, brain generation, governance validation, bot lifecycle state, and local release packaging.
+- Phase 2A: controlled bot workflow engine for approved `.avipack` artifacts only.
+- Phase 2B: conflict engine.
+- Phase 3: starter pack expansion.
+- Phase 4: Codex, Cursor, and IDE adapters.
+- Phase 5: npm publishing and installers.
 
 ## Current Status
 
-Avipack is in early MVP stage. The repository establishes structure, documentation, command design, templates, safe TypeScript stubs, and a working `avipack init` flow for the generic brain-only template.
+Avipack is in release-candidate foundation stage. The repository establishes local CLI behavior, documentation, command design, templates, structured brain validation, manual bot lifecycle state, local install packaging, and a Phase 2A safe bot workflow foundation. Bot-specific workflow intelligence is planned for later Phase 2A steps.

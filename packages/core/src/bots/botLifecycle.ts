@@ -5,6 +5,8 @@ import type { AvipackConfig } from "../config/types.js";
 import type { BotManifest } from "../plugins/botManifest.js";
 import { findKnownBot, listKnownBots } from "../plugins/botRegistry.js";
 import { canWriteBotReport, describeBotPermissions } from "./botPermissions.js";
+import type { BotRunMode, BotRunResult } from "./bot-run-result.js";
+import { runBotWorkflow } from "./workflow-engine.js";
 
 export type BotState = {
   installed: string[];
@@ -26,6 +28,7 @@ export type BotActionResult = {
     | "dry-run";
   config?: AvipackConfig;
   reportPath?: string;
+  runResult?: BotRunResult;
 };
 
 export class UnknownBotError extends Error {
@@ -53,6 +56,13 @@ export class BotNotEnabledError extends Error {
   constructor(bot: BotManifest) {
     super(`${bot.name} is not enabled in this project.`);
     this.name = "BotNotEnabledError";
+  }
+}
+
+export class InvalidBotRunModeError extends Error {
+  constructor() {
+    super("Use either --dry-run or --apply, not both.");
+    this.name = "InvalidBotRunModeError";
   }
 }
 
@@ -163,16 +173,23 @@ export function canRunBot(input: string, options: { cwd?: string; allowDisabled?
   return bot;
 }
 
-export async function runBot(input: string, options: { cwd?: string; dryRun?: boolean; allowDisabled?: boolean } = {}): Promise<BotActionResult> {
+export async function runBot(input: string, options: { cwd?: string; dryRun?: boolean; apply?: boolean; allowDisabled?: boolean } = {}): Promise<BotActionResult> {
   const cwd = resolve(options.cwd ?? process.cwd());
-  const bot = canRunBot(input, { cwd, allowDisabled: options.allowDisabled });
-
-  if (options.dryRun) {
-    return { bot, status: "dry-run" };
+  if (options.dryRun && options.apply) {
+    throw new InvalidBotRunModeError();
   }
 
-  const reportPath = await writeBotExecutionReport(cwd, bot);
-  return { bot, status: "ran", reportPath };
+  const bot = canRunBot(input, { cwd, allowDisabled: options.allowDisabled });
+  const config = requireProjectConfig(cwd);
+  const mode: BotRunMode = options.dryRun ? "dry-run" : options.apply ? "apply" : "report";
+  const runResult = await runBotWorkflow({ cwd, bot, config, mode });
+
+  return {
+    bot,
+    status: options.dryRun ? "dry-run" : "ran",
+    reportPath: runResult.reportPath,
+    runResult
+  };
 }
 
 export function listBotsWithState(cwd = process.cwd()): Array<BotManifest & { installed: boolean; enabled: boolean }> {

@@ -10,4 +10,7 @@ export interface BotManifest {
   version: string;
   description: string;
   permissions: BotPermissions;
+  supportsApply?: boolean;
+  allowedActions?: string[];
+  blockedActions?: string[];
 }
