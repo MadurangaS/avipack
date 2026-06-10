@@ -77,6 +77,7 @@ Purpose: Validate brain structure and basic trace consistency.
 
 Options:
 
+- `--json`: print machine-readable validation output.
 - `--report`: write `.avipack/reports/brain-check.md`.
 - `--strict`: fail when warnings are present.
 
@@ -84,11 +85,12 @@ Example:
 
 ```bash
 avipack brain check
+avipack brain check --json
 avipack brain check --report
 avipack brain check --strict
 ```
 
-Current MVP behavior: checks required paths, validates YAML parsing for brain/config YAML files, reports duplicate requirement IDs, reports duplicate architecture IDs, and warns when requirement traces reference unknown change requests, architecture IDs, or planned test IDs.
+Current MVP behavior: checks required paths, validates YAML parsing for brain/config YAML files, validates structured governance models, reports duplicate requirement/architecture/test IDs, detects invalid requirement status and priority values, validates sprint-lock references, detects unknown bot IDs and enabled-but-not-installed bots, and warns when traces reference unknown change requests, ADRs, architecture IDs, requirement IDs, or planned test IDs.
 
 ## `avipack doctor`
 

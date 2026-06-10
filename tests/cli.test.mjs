@@ -183,6 +183,18 @@ test("avipack brain check passes after init", async () => {
   assert.match(stdout, /Status: passed/);
 });
 
+test("avipack brain check --json returns validation report", async () => {
+  const cwd = await tempProject();
+  await runCli(["init", "--name", "BrainJsonCliApp"], cwd);
+  const { stdout } = await runCli(["brain", "check", "--json"], cwd);
+  const parsed = JSON.parse(stdout);
+
+  assert.equal(parsed.passed, true);
+  assert.equal(parsed.validationReport.ok, true);
+  assert.equal(Array.isArray(parsed.validationReport.errors), true);
+  assert.equal(Array.isArray(parsed.validationReport.warnings), true);
+});
+
 test("avipack brain check --report outside project does not create .avipack", async () => {
   const cwd = await tempProject();
 

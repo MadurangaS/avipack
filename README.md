@@ -56,6 +56,7 @@ Future user-facing usage:
 npx avipack init --name demo-project
 npx avipack adopt
 npx avipack brain check
+npx avipack brain check --json
 ```
 
 Current local CLI usage after building:
@@ -98,7 +99,7 @@ avipack doctor
 avipack version
 ```
 
-`avipack init` and `avipack adopt` are implemented for the `generic-brain-only` template. Bot lifecycle commands, brain checks, change request generation, and ADR generation now have local MVP behavior.
+`avipack init` and `avipack adopt` are implemented for the `generic-brain-only` template. Bot lifecycle commands, structured governance brain checks, change request generation, and ADR generation now have local MVP behavior.
 
 ## Brain Folder Overview
 
@@ -191,7 +192,7 @@ pnpm pack:cli
 tar -tzf packages/cli/avipack-0.1.0.tgz
 ```
 
-Avipack is not published to npm yet. There is no hosted service, LLM provider integration, autonomous bot execution, background daemon, scheduler, or Git hook execution in this milestone.
+Avipack is not published to npm yet. There is no hosted service, LLM provider integration, autonomous bot execution, background daemon, scheduler, Git hook execution, or sprint diff enforcement in this milestone.
 
 ## Clean Source ZIP
 

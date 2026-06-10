@@ -8,14 +8,30 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "title", "status", "description"],
+        "required": ["id", "title", "statement", "status", "priority", "version", "traces"],
         "properties": {
           "id": { "type": "string", "pattern": "^REQ-[0-9]{3,}$" },
-          "title": { "type": "string" },
-          "status": { "type": "string" },
-          "priority": { "type": "string" },
-          "description": { "type": "string" },
-          "traces": { "type": "object" }
+          "title": { "type": "string", "minLength": 1 },
+          "statement": { "type": "string", "minLength": 1 },
+          "status": {
+            "type": "string",
+            "enum": ["proposed", "approved", "in_progress", "done", "rejected", "deferred"]
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"]
+          },
+          "version": { "type": "integer", "minimum": 1 },
+          "owner": { "type": "string" },
+          "traces": {
+            "type": "object",
+            "properties": {
+              "architecture": { "type": "array", "items": { "type": "string" } },
+              "tests": { "type": "array", "items": { "type": "string" } },
+              "changes": { "type": "array", "items": { "type": "string" } },
+              "decisions": { "type": "array", "items": { "type": "string" } }
+            }
+          }
         }
       }
     }

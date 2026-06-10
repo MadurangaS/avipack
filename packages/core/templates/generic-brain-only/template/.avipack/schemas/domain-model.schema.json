@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Avipack Domain Model",
+  "type": "object",
+  "required": ["entities", "relationships"],
+  "properties": {
+    "entities": { "type": "array" },
+    "relationships": { "type": "array" }
+  }
+}

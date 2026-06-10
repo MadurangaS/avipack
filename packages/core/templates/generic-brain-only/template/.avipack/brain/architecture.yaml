@@ -1,21 +1,23 @@
-system_overview:
-  id: ARCH-001
-  summary: The project keeps operational context in .avipack and treats it as the source of truth for scope and decisions.
+architecture:
+  components:
+    - id: ARCH-001
+      name: "Avipack Brain"
+      type: folder
+      description: "Versioned project memory for requirements, architecture, testing strategy, security rules, glossary, ADRs, and change requests."
+      responsibilities:
+        - "Store project intent and governance data"
+        - "Keep requirements traceable to architecture, tests, changes, and decisions"
+      related_requirements:
+        - REQ-001
+        - REQ-002
 
-modules:
-  - id: ARCH-002
-    name: project-brain
-    responsibility: Stores requirements, architecture notes, testing strategy, security rules, glossary, ADRs, and change requests.
-  - id: ARCH-003
-    name: agent-control
-    responsibility: Defines rules and permissions for human-guided coding agents and optional bots.
-
-boundaries:
-  - Brain files may describe application behavior but should not contain secrets.
-  - Bots and agents must follow the write scopes documented in the project brain.
-  - Architecture changes require ADR updates.
-
-future_extensions:
-  - Automated conflict checks between requirements, architecture, tests, and implementation.
-  - Bot permission enforcement.
-  - CI checks for brain consistency.
+    - id: ARCH-002
+      name: "Owner-Controlled Bot Layer"
+      type: plugin-boundary
+      description: "Optional bot packages that remain manual, permission-scoped, and disabled from autonomous execution."
+      responsibilities:
+        - "Record installed and enabled bot state in project configuration"
+        - "Run bot workflows only through explicit commands"
+        - "Write audit reports instead of hidden source changes"
+      related_requirements:
+        - REQ-003

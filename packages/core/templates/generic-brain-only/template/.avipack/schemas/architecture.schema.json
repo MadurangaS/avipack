@@ -2,11 +2,28 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Avipack Architecture",
   "type": "object",
-  "required": ["system_overview", "modules", "boundaries", "future_extensions"],
+  "required": ["architecture"],
   "properties": {
-    "system_overview": { "type": "object" },
-    "modules": { "type": "array" },
-    "boundaries": { "type": "array" },
-    "future_extensions": { "type": "array" }
+    "architecture": {
+      "type": "object",
+      "required": ["components"],
+      "properties": {
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "type", "description"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^ARCH-[0-9]{3,}$" },
+              "name": { "type": "string", "minLength": 1 },
+              "type": { "type": "string", "minLength": 1 },
+              "description": { "type": "string", "minLength": 1 },
+              "responsibilities": { "type": "array", "items": { "type": "string" } },
+              "related_requirements": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    }
   }
 }

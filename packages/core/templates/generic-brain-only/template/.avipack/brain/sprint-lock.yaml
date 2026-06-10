@@ -1,0 +1,8 @@
+sprint_lock:
+  status: unlocked
+  active_sprint: null
+  locked_requirements: []
+  locked_architecture: []
+  locked_tests: []
+  notes:
+    - "When locked, Avipack should warn before changing approved scope without a change request."

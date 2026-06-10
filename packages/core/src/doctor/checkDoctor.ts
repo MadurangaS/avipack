@@ -4,6 +4,7 @@ import { checkBrain } from "../brain/checkBrain.js";
 import { isAvipackProject, loadConfig } from "../config/loadConfig.js";
 import type { AvipackConfig } from "../config/types.js";
 import { listKnownBots } from "../plugins/botRegistry.js";
+import { createValidationReport, type ValidationIssue, type ValidationReport } from "../validation/results.js";
 
 export interface DoctorCheck {
   name: string;
@@ -31,6 +32,8 @@ export interface DoctorResult {
   checks: DoctorCheck[];
   errors: string[];
   warnings: string[];
+  issues: ValidationIssue[];
+  validationReport: ValidationReport;
 }
 
 export function checkDoctor(cwd = process.cwd()): DoctorResult {
@@ -38,6 +41,7 @@ export function checkDoctor(cwd = process.cwd()): DoctorResult {
   const checks: DoctorCheck[] = [];
   const errors: string[] = [];
   const warnings: string[] = [];
+  const issues: ValidationIssue[] = [];
   const hasAvipackDirectory = existsSync(join(targetDir, ".avipack"));
   const hasConfig = existsSync(join(targetDir, "avipack.config.yaml"));
   const project = isAvipackProject(targetDir);
@@ -50,6 +54,11 @@ export function checkDoctor(cwd = process.cwd()): DoctorResult {
   if (!project) {
     addCheck(checks, "Avipack project", "warning", "Current directory is not an Avipack project.");
     warnings.push("Current directory is not an Avipack project.");
+    issues.push({
+      code: "DOCTOR_NOT_AVIPACK_PROJECT",
+      severity: "warning",
+      message: "Current directory is not an Avipack project."
+    });
   } else {
     addCheck(checks, "Avipack project", "ok", "yes");
   }
@@ -57,6 +66,12 @@ export function checkDoctor(cwd = process.cwd()): DoctorResult {
   if (!hasAvipackDirectory) {
     addCheck(checks, ".avipack directory", project ? "error" : "warning", "missing");
     (project ? errors : warnings).push(".avipack directory is missing.");
+    issues.push({
+      code: "DOCTOR_AVIPACK_DIRECTORY_MISSING",
+      severity: project ? "error" : "warning",
+      message: ".avipack directory is missing.",
+      file: ".avipack"
+    });
   } else {
     addCheck(checks, ".avipack directory", "ok", "present");
   }
@@ -64,6 +79,12 @@ export function checkDoctor(cwd = process.cwd()): DoctorResult {
   if (!hasConfig) {
     addCheck(checks, "Config", project ? "error" : "warning", "avipack.config.yaml is missing.");
     (project ? errors : warnings).push("avipack.config.yaml is missing.");
+    issues.push({
+      code: "DOCTOR_CONFIG_MISSING",
+      severity: project ? "error" : "warning",
+      message: "avipack.config.yaml is missing.",
+      file: "avipack.config.yaml"
+    });
   } else {
     try {
       config = loadConfig(targetDir);
@@ -72,6 +93,12 @@ export function checkDoctor(cwd = process.cwd()): DoctorResult {
     } catch (error) {
       addCheck(checks, "Config", "error", error instanceof Error ? error.message : "config parse failed");
       errors.push("avipack.config.yaml is not parseable.");
+      issues.push({
+        code: "DOCTOR_CONFIG_PARSE_ERROR",
+        severity: "error",
+        message: "avipack.config.yaml is not parseable.",
+        file: "avipack.config.yaml"
+      });
     }
   }
 
@@ -80,11 +107,17 @@ export function checkDoctor(cwd = process.cwd()): DoctorResult {
     addCheck(checks, "Brain files", brainFilesOk ? "ok" : "error", brainFilesOk ? "ok" : "missing or invalid required brain files");
     if (!brainFilesOk) {
       errors.push("Required brain files are missing or invalid.");
+      issues.push({
+        code: "DOCTOR_BRAIN_FILES_INVALID",
+        severity: "error",
+        message: "Required brain files are missing or invalid."
+      });
     }
   }
 
-  const botsOk = config ? validateBots(config, checks, errors) : undefined;
-  const reportsWritable = hasAvipackDirectory ? checkReportsWritable(targetDir, checks, errors) : undefined;
+  const botsOk = config ? validateBots(config, checks, errors, issues) : undefined;
+  const reportsWritable = hasAvipackDirectory ? checkReportsWritable(targetDir, checks, errors, issues) : undefined;
+  const validationReport = createValidationReport(issues);
 
   return {
     healthy: errors.length === 0,
@@ -105,17 +138,41 @@ export function checkDoctor(cwd = process.cwd()): DoctorResult {
     },
     checks,
     errors,
-    warnings
+    warnings,
+    issues,
+    validationReport
   };
 }
 
-function validateBots(config: AvipackConfig, checks: DoctorCheck[], errors: string[]): boolean {
+function validateBots(config: AvipackConfig, checks: DoctorCheck[], errors: string[], issues: ValidationIssue[]): boolean {
   const knownBotIds = new Set(listKnownBots().map((bot) => bot.id));
   const invalidBots = [...config.bots.installed, ...config.bots.enabled].filter((botId) => !knownBotIds.has(botId));
+  const installed = new Set(config.bots.installed);
+  const enabledNotInstalled = config.bots.enabled.filter((botId) => !installed.has(botId));
 
   if (invalidBots.length > 0) {
     addCheck(checks, "Bots", "error", `unknown bot ids: ${[...new Set(invalidBots)].join(", ")}`);
     errors.push("Config references unknown bot ids.");
+    issues.push({
+      code: "DOCTOR_UNKNOWN_BOT",
+      severity: "error",
+      message: "Config references unknown bot ids.",
+      file: "avipack.config.yaml",
+      path: "bots"
+    });
+    return false;
+  }
+
+  if (enabledNotInstalled.length > 0) {
+    addCheck(checks, "Bots", "error", `enabled bots are not installed: ${[...new Set(enabledNotInstalled)].join(", ")}`);
+    errors.push("Config enables bots that are not installed.");
+    issues.push({
+      code: "DOCTOR_ENABLED_BOT_NOT_INSTALLED",
+      severity: "error",
+      message: "Config enables bots that are not installed.",
+      file: "avipack.config.yaml",
+      path: "bots.enabled"
+    });
     return false;
   }
 
@@ -123,7 +180,7 @@ function validateBots(config: AvipackConfig, checks: DoctorCheck[], errors: stri
   return true;
 }
 
-function checkReportsWritable(cwd: string, checks: DoctorCheck[], errors: string[]): boolean {
+function checkReportsWritable(cwd: string, checks: DoctorCheck[], errors: string[], issues: ValidationIssue[]): boolean {
   const reportsDir = join(cwd, ".avipack/reports");
   const writableTarget = existsSync(reportsDir) ? reportsDir : join(cwd, ".avipack");
 
@@ -134,6 +191,12 @@ function checkReportsWritable(cwd: string, checks: DoctorCheck[], errors: string
   } catch {
     addCheck(checks, "Reports directory", "error", "not writable");
     errors.push("Reports directory is not writable.");
+    issues.push({
+      code: "DOCTOR_REPORTS_NOT_WRITABLE",
+      severity: "error",
+      message: "Reports directory is not writable.",
+      file: ".avipack/reports"
+    });
     return false;
   }
 }

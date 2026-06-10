@@ -62,7 +62,9 @@ The brain stores project state and control documents:
 - Agent rules.
 - Reports.
 
-`avipack brain check` validates required files, YAML parsing, duplicate IDs, and simple requirement traces. Report output is written only when explicitly requested with `--report`.
+`avipack brain check` validates required files, YAML parsing, structured brain/config fields, duplicate IDs, bot config consistency, sprint-lock references, and trace references between requirements, architecture, tests, change requests, and ADRs. Report output is written only when explicitly requested with `--report`; machine-readable output is available with `--json`.
+
+The v0.2 governance validation engine uses a small dependency-free validator in `@avipack/core` and emits structured validation issues with codes, severity, messages, file paths, and optional YAML paths. The generated template also includes JSON Schema files under `.avipack/schemas/` so the brain format is self-describing and can move to AJV later without changing the project data model.
 
 ## Extension Points
 

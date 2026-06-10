@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -125,6 +125,18 @@ test("brain check catches missing files", async () => {
   assert.ok(result.errors.length > 0);
 });
 
+test("valid generated brain passes structured validation", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "ValidBrainApp" });
+
+  const result = checkBrain(cwd);
+
+  assert.equal(result.passed, true);
+  assert.equal(result.validationReport.ok, true);
+  assert.deepEqual(result.validationReport.errors, []);
+  assert.deepEqual(result.validationReport.warnings, []);
+});
+
 test("brain check report outside Avipack project does not create .avipack", async () => {
   const cwd = await tempProject();
   const result = checkBrain({ cwd, report: true });
@@ -143,6 +155,151 @@ test("brain check catches invalid YAML", async () => {
   const result = checkBrain(cwd);
   assert.equal(result.passed, false);
   assert.ok(result.errors.some((error) => error.includes("Invalid YAML")));
+});
+
+test("brain check catches duplicate requirement IDs", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "DuplicateRequirementApp" });
+  const requirementsPath = join(cwd, ".avipack/brain/requirements.yaml");
+  const source = await readFile(requirementsPath, "utf8");
+  await writeFile(requirementsPath, source.replace("REQ-002", "REQ-001"));
+
+  const result = checkBrain(cwd);
+  assert.equal(result.passed, false);
+  assert.ok(result.errors.some((error) => error.includes("Duplicate requirement ID: REQ-001")));
+});
+
+test("brain check detects unknown trace references", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "UnknownTraceApp" });
+  const requirementsPath = join(cwd, ".avipack/brain/requirements.yaml");
+  const source = await readFile(requirementsPath, "utf8");
+  await writeFile(
+    requirementsPath,
+    source
+      .replace("ARCH-001", "ARCH-999")
+      .replace("TEST-001", "TEST-999")
+      .replace("CR-0001", "CR-9999")
+      .replace("ADR-0001", "ADR-9999")
+  );
+
+  const result = checkBrain(cwd);
+  assert.equal(result.passed, true);
+  assert.ok(result.warnings.some((warning) => warning.includes("unknown architecture ID: ARCH-999")));
+  assert.ok(result.warnings.some((warning) => warning.includes("unknown test ID: TEST-999")));
+  assert.ok(result.warnings.some((warning) => warning.includes("unknown change request: CR-9999")));
+  assert.ok(result.warnings.some((warning) => warning.includes("unknown decision: ADR-9999")));
+});
+
+test("brain check catches invalid requirement status", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "InvalidStatusApp" });
+  const requirementsPath = join(cwd, ".avipack/brain/requirements.yaml");
+  const source = await readFile(requirementsPath, "utf8");
+  await writeFile(requirementsPath, source.replace("status: approved", "status: accepted"));
+
+  const result = checkBrain(cwd);
+  assert.equal(result.passed, false);
+  assert.ok(result.errors.some((error) => error.includes("Requirement status must be one of")));
+});
+
+test("brain check catches invalid requirement priority", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "InvalidPriorityApp" });
+  const requirementsPath = join(cwd, ".avipack/brain/requirements.yaml");
+  const source = await readFile(requirementsPath, "utf8");
+  await writeFile(requirementsPath, source.replace("priority: high", "priority: urgent"));
+
+  const result = checkBrain(cwd);
+  assert.equal(result.passed, false);
+  assert.ok(result.errors.some((error) => error.includes("Requirement priority must be one of")));
+});
+
+test("sprint lock unlocked passes validation", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "SprintUnlockedApp" });
+
+  const result = checkBrain(cwd);
+  assert.equal(result.passed, true);
+});
+
+test("sprint lock locked with missing requirement fails", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "SprintLockedApp" });
+  await writeFile(
+    join(cwd, ".avipack/brain/sprint-lock.yaml"),
+    `sprint_lock:
+  status: locked
+  active_sprint: sprint-1
+  locked_requirements:
+    - REQ-999
+  locked_architecture: []
+  locked_tests: []
+  notes: []
+`
+  );
+
+  const result = checkBrain(cwd);
+  assert.equal(result.passed, false);
+  assert.ok(result.errors.some((error) => error.includes("Sprint lock references unknown requirement ID: REQ-999")));
+});
+
+test("brain check detects enabled bot that is not installed", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "EnabledBotApp" });
+  await writeFile(
+    join(cwd, "avipack.config.yaml"),
+    `project:
+  name: EnabledBotApp
+
+brain:
+  root: .avipack
+  path: .avipack/brain
+
+bots:
+  installed: []
+  enabled:
+    - avipack.bot.brain
+`
+  );
+
+  const result = checkBrain(cwd);
+  assert.equal(result.passed, false);
+  assert.ok(result.errors.some((error) => error.includes("Config enables bot that is not installed")));
+});
+
+test("brain check detects unknown bot IDs", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "UnknownBotApp" });
+  await writeFile(
+    join(cwd, "avipack.config.yaml"),
+    `project:
+  name: UnknownBotApp
+
+brain:
+  root: .avipack
+  path: .avipack/brain
+
+bots:
+  installed:
+    - avipack.bot.unknown
+  enabled: []
+`
+  );
+
+  const result = checkBrain(cwd);
+  assert.equal(result.passed, false);
+  assert.ok(result.errors.some((error) => error.includes("Config references unknown bot ID: avipack.bot.unknown")));
+});
+
+test("brain check catches missing required generated file", async () => {
+  const cwd = await tempProject();
+  await createBrain({ cwd, projectName: "MissingGeneratedFileApp" });
+  await rm(join(cwd, ".avipack/brain/project.yaml"));
+
+  const result = checkBrain(cwd);
+  assert.equal(result.passed, false);
+  assert.ok(result.errors.some((error) => error.includes("Missing required file: .avipack/brain/project.yaml")));
 });
 
 test("change numbering works", async () => {

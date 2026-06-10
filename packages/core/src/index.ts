@@ -6,6 +6,8 @@ export { writeAdoptionReport } from "./adoption/writeAdoptionReport.js";
 export { checkBrain } from "./brain/checkBrain.js";
 export { checkDoctor } from "./doctor/checkDoctor.js";
 export type { DoctorCheck, DoctorResult } from "./doctor/checkDoctor.js";
+export { createValidationReport, issueMessage } from "./validation/results.js";
+export type { ValidationIssue, ValidationReport, ValidationSeverity } from "./validation/results.js";
 export { addInstalledBot, AvipackProjectRequiredError, BotNotEnabledError, BotNotInstalledError, canRunBot, disableBot, enableBot, getBotState, listBotsWithState, requireKnownBot, resolveKnownBot, runBot, UnknownBotError } from "./bots/botLifecycle.js";
 export type { BotActionResult, BotState } from "./bots/botLifecycle.js";
 export { canWriteBotReport, isAllowedAvipackWritePath } from "./bots/botPermissions.js";

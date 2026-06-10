@@ -1,30 +1,51 @@
 requirements:
   - id: REQ-001
-    title: Project brain must be created
-    status: accepted
+    title: "Maintain project brain"
+    statement: "The project shall maintain a versioned project brain that acts as the source of truth for AI-assisted development."
+    status: approved
     priority: high
-    description: The project must contain an Avipack Brain folder with structured project memory.
+    version: 1
+    owner: "project-owner"
     traces:
-      architecture: [ARCH-001]
-      tests: [TEST-001]
-      changes: [CR-0001]
+      architecture:
+        - ARCH-001
+      tests:
+        - TEST-001
+      changes:
+        - CR-0001
+      decisions:
+        - ADR-0001
 
   - id: REQ-002
-    title: Requirements must be versioned
-    status: accepted
+    title: "Version requirements"
+    statement: "The project shall use stable requirement IDs so scope changes can be reviewed and traced over time."
+    status: approved
     priority: high
-    description: Requirements must use stable IDs so changes can be reviewed and traced over time.
+    version: 1
+    owner: "project-owner"
     traces:
-      architecture: [ARCH-002]
-      tests: [TEST-002]
-      changes: [CR-0001]
+      architecture:
+        - ARCH-001
+      tests:
+        - TEST-002
+      changes:
+        - CR-0001
+      decisions:
+        - ADR-0001
 
   - id: REQ-003
-    title: Bots must run only by explicit command
-    status: accepted
+    title: "Require manual bot execution"
+    statement: "Bots shall run only through explicit owner-controlled commands and shall not execute autonomously."
+    status: approved
     priority: high
-    description: Bots must not run silently or modify the project without an owner-controlled command.
+    version: 1
+    owner: "project-owner"
     traces:
-      architecture: [ARCH-003]
-      tests: [TEST-003]
-      changes: [CR-0001]
+      architecture:
+        - ARCH-002
+      tests:
+        - TEST-003
+      changes:
+        - CR-0001
+      decisions:
+        - ADR-0001

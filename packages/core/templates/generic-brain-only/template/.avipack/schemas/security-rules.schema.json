@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Avipack Security Rules",
+  "type": "object",
+  "required": ["rules"],
+  "properties": {
+    "rules": { "type": "object" }
+  }
+}

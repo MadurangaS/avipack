@@ -1,21 +1,23 @@
-unit_tests:
-  goal: Validate small units of project logic.
-  planned_checks:
-    - TEST-001: Brain creation utilities produce required files.
+testing:
+  strategy: "Node.js built-in test runner for CLI and core package validation."
+  test_cases:
+    - id: TEST-001
+      title: "Brain initialization creates required files"
+      type: unit
+      related_requirements:
+        - REQ-001
+      command: "pnpm test"
 
-integration_tests:
-  goal: Validate behavior across package and CLI boundaries.
-  planned_checks:
-    - TEST-002: CLI commands can read config and brain files.
+    - id: TEST-002
+      title: "Requirement trace validation detects unknown references"
+      type: unit
+      related_requirements:
+        - REQ-002
+      command: "pnpm test"
 
-cli_tests:
-  goal: Validate command output and exit behavior.
-  planned_checks:
-    - TEST-003: Bot commands are manual and do not modify files without explicit execution.
-
-brain_validation_tests:
-  goal: Validate project brain consistency.
-  planned_checks:
-    - Required brain files exist.
-    - Requirement IDs are unique.
-    - Requirement traces point to known architecture, test, and change IDs.
+    - id: TEST-003
+      title: "Bot commands remain manual and owner-controlled"
+      type: integration
+      related_requirements:
+        - REQ-003
+      command: "pnpm test"

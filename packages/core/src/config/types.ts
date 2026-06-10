@@ -1,3 +1,5 @@
+import type { ValidationIssue, ValidationReport } from "../validation/results.js";
+
 export interface AvipackConfig {
   project: {
     id?: string;
@@ -21,6 +23,8 @@ export interface BrainCheckResult {
   missingFiles: string[];
   errors: string[];
   warnings: string[];
+  issues?: ValidationIssue[];
+  validationReport?: ValidationReport;
   reportWritten?: boolean;
   reportMessage?: string;
 }

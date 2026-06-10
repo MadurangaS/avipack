@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Avipack Sprint Lock",
+  "type": "object",
+  "required": ["sprint_lock"],
+  "properties": {
+    "sprint_lock": {
+      "type": "object",
+      "required": ["status", "active_sprint", "locked_requirements", "locked_architecture", "locked_tests", "notes"],
+      "properties": {
+        "status": { "type": "string", "enum": ["locked", "unlocked"] },
+        "active_sprint": { "type": ["string", "null"] },
+        "locked_requirements": { "type": "array", "items": { "type": "string" } },
+        "locked_architecture": { "type": "array", "items": { "type": "string" } },
+        "locked_tests": { "type": "array", "items": { "type": "string" } },
+        "notes": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

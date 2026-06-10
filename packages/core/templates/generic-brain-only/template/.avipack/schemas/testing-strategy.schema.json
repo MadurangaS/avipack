@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Avipack Testing Strategy",
+  "type": "object",
+  "required": ["testing"],
+  "properties": {
+    "testing": {
+      "type": "object",
+      "required": ["strategy", "test_cases"],
+      "properties": {
+        "strategy": { "type": "string", "minLength": 1 },
+        "test_cases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "title", "type", "related_requirements"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^TEST-[0-9]{3,}$" },
+              "title": { "type": "string", "minLength": 1 },
+              "type": { "type": "string", "minLength": 1 },
+              "related_requirements": { "type": "array", "items": { "type": "string" } },
+              "command": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
